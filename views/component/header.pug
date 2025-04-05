@@ -1,0 +1,141 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        style.
+            .slider {
+                display: flex;
+                gap: 50px; /* Space between items */
+                align-items: center; /* Align items vertically */
+            }
+            .img-slider {
+                text-align: center;
+            }
+            .dropdown-hidden {
+                display: none; /* Initially hide dropdowns */
+            }
+
+            @media (max-width: 768px) { /* Target mobile devices */
+                .slider {
+                    display: flex;
+                    gap: 50px; /* Space between items */
+                    align-items: center; /* Align items vertically */
+                    overflow-x: auto; /* Enable horizontal scrolling */
+                    white-space: nowrap; /* Prevent wrapping */
+                    scroll-behavior: smooth; /* Smooth scrolling */
+                }
+
+                .slider::-webkit-scrollbar {
+                    height: 6px; /* Thin scrollbar for a cleaner look */
+                    background: #f9f9f9; /* Light background for the scrollbar */
+                }
+
+                .slider::-webkit-scrollbar-thumb {
+                    background: #bbb; /* Scrollbar thumb color */
+                    border-radius: 3px; /* Rounded edges */
+                }
+
+                .slider::-webkit-scrollbar-thumb:hover {
+                    background: #888; /* Thumb color on hover */
+                }
+            }
+
+    body
+        .container
+            .slider
+                .img-slider1.img-slider
+                    img(
+                        src="header/women.jpg" 
+                        alt="Slider Image 1" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
+                        onclick="toggleDropdown('dropdown1')"
+                    )  
+                    p Women
+                    
+                        
+
+                .img-slider2.img-slider
+                    img(
+                        src="header/kids.jpg" 
+                        alt="Slider Image 2" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
+                        onclick="toggleDropdown('dropdown2')"
+                    ) 
+                    p Kids & Infants
+                    
+
+                .img-slider3.img-slider
+                    img(
+                        src="header/men.jpg" 
+                        alt="Slider Image 3" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
+                        onclick="redirectToMenPage()"
+                    ) 
+                    p Men's Fashion
+
+                    
+
+                .img-slider4.img-slider
+                    img(
+                        src="header/kitchen.jpg" 
+                        alt="Slider Image 4" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
+                        onclick="toggleDropdown('dropdown4')"
+                    ) 
+                    p Home & Kitchen
+                    
+
+                .img-slider5.img-slider
+                    img(
+                        src="header/appliances.jpg" 
+                        alt="Slider Image 5" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
+                        onclick="toggleDropdown('dropdown5')"
+                    ) 
+                    p Appliances
+                    
+                .img-slider6.img-slider
+                    img(
+                        src="header/travel.jpg" 
+                        alt="Slider Image 6" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
+                        onclick="toggleDropdown('dropdown6')"
+                    ) 
+                    p Travel
+                    
+
+                .img-slider7.img-slider
+                    img(
+                        src="header/food.jpg" 
+                        alt="Slider Image 7" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
+                        onclick="toggleDropdown('dropdown7')"
+                    ) 
+                    p Food
+                    
+
+                .img-slider8.img-slider
+                    img(
+                        src="header/personalcare.jpg" 
+                        alt="Slider Image 8" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
+                        onclick="toggleDropdown('dropdown8')"
+                    ) 
+                    p Personal Care
+                    
+
+                .img-slider9.img-slider
+                    img(
+                        src="header/household.jpg" 
+                        alt="Slider Image 9" 
+                        style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
+                        onclick="toggleDropdown('dropdown9')"
+                    ) 
+                    p Household Care
+                    
+script. 
+    function redirectToMenPage() {
+        // Replace 'men.html' with the actual URL or file path of your Men's Fashion page
+        window.location.href = '/component/men.pug';
+    }
