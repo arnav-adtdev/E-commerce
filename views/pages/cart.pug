@@ -34,7 +34,11 @@ html(lang="en")
             row.innerHTML = `
               <td>${item.name}</td>
               <td>₹${item.price}</td>
-              <td>${item.quantity}</td>
+              <td>
+                <button class="btn btn-secondary btn-sm decrease-btn" data-index="${index}">-</button>
+                <span class="mx-2">${item.quantity}</span>
+                <button class="btn btn-secondary btn-sm increase-btn" data-index="${index}">+</button>
+              </td>
               <td>
                 <button class="btn btn-danger btn-sm remove-btn" data-index="${index}">Remove</button>
               </td>
@@ -49,11 +53,20 @@ html(lang="en")
         }
 
         cartItemsContainer.addEventListener('click', function (e) {
+          const index = e.target.dataset.index;
+
           if (e.target.classList.contains('remove-btn')) {
-            const index = e.target.dataset.index;
             cart.splice(index, 1); // Remove item from cart
-            updateCart();
+          } else if (e.target.classList.contains('increase-btn')) {
+            cart[index].quantity += 1; // Increase quantity
+          } else if (e.target.classList.contains('decrease-btn')) {
+            if (cart[index].quantity > 1) {
+              cart[index].quantity -= 1; // Decrease quantity
+            } else {
+              cart.splice(index, 1); // Remove item if quantity is 0
+            }
           }
+          updateCart();
         });
 
         checkoutButton.addEventListener('click', function () {
