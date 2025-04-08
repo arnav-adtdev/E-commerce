@@ -23,24 +23,27 @@ app.use(cors());
 
 // Session Middleware (Stores OTP temporarily)
 
-app.use(session({
-    secret: 'your-secret-key',
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Use secure: true in production with HTTPS
-}));
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  })
+);
 
 // Home Route
 app.get("/", (req, res) => {
   res.render("index", { title: "E-COM WEBSITE" });
 });
 
-app.get('/views/pages/cart', (req, res) => {
-  res.render('cart'); 
+app.get('/cart', (req, res) => {
+  res.render("pages/cart"); 
 });
 
-app.get("/views/component/men", (req, res) => {
-  res.render("men");
+
+app.get("/men", (req, res) => {
+  res.render("pages/men");
 });
 
 
@@ -54,7 +57,7 @@ app.post('/send-otp', (req, res) => {
   // OTP generation logic
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   req.session.otp = otp;
-
+  req.session.otpExpiry = Date.now() + 300000; // OTP expires in 5 minutes
   // Simulating sending OTP (In reality, integrate with an SMS API)
   console.log(`Sending OTP ${otp} to phone number ${phoneNumber}`);
 
@@ -71,8 +74,8 @@ app.post('/save-user', async (req, res) => {
   console.log("User-provided OTP:", otp);
 
   // Verify OTP
-  if (!req.session || req.session.otp !== otp) {
-    return res.status(400).json({ success: false, message: "Invalid OTP" });
+  if (!req.session?.otp || req.session.otp !== otp || Date.now() > req.session.otpExpiry) {
+    return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
   }
 
   try {
@@ -109,19 +112,19 @@ const checkUserInDatabase = async (mobile) => {
 };
 
 
-app.post('/check-user', async (req, res) => {
+app.post("/check-user", async (req, res) => {
+  const { mobile } = req.body;
+
+  if (!mobile) {
+    return res.status(400).json({ success: false, message: "Mobile number is required." });
+  }
+
   try {
-      const { mobile } = req.body;
-
-      if (!mobile) {
-          return res.status(400).json({ message: 'Mobile number is required.' });
-      }
-
-      const userExists = await checkUserInDatabase(mobile);
-      return res.status(200).json({ exists: userExists });
+    const userExists = await User.exists({ mobile });
+    res.status(200).json({ success: true, exists: !!userExists });
   } catch (error) {
-      console.error('Error in /check-user:', error);
-      return res.status(500).json({ message: 'An unexpected error occurred.' });
+    console.error("Error in /check-user:", error);
+    res.status(500).json({ success: false, message: "An unexpected error occurred." });
   }
 });
 

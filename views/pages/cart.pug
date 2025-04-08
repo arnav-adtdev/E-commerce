@@ -14,27 +14,58 @@ html(lang="en")
             th Product Name
             th Price
             th Quantity
+            th Actions
         tbody#cart-items
       p#total-price.fw-bold.fs-4.mt-4
+      button#checkout-btn.btn.btn-success Checkout
     script.
-      // Load cart from localStorage
       document.addEventListener('DOMContentLoaded', function () {
         const cartItemsContainer = document.getElementById('cart-items');
         const totalPriceElement = document.getElementById('total-price');
+        const checkoutButton = document.getElementById('checkout-btn');
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-        let total = 0;
-        cart.forEach(item => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${item.name}</td>
-            <td>₹${item.price}</td>
-            <td>${item.quantity}</td>
-          `;
-          cartItemsContainer.appendChild(row);
+        function updateCart() {
+          cartItemsContainer.innerHTML = '';
+          let total = 0;
 
-          total += item.price * item.quantity;
+          cart.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.name}</td>
+              <td>₹${item.price}</td>
+              <td>${item.quantity}</td>
+              <td>
+                <button class="btn btn-danger btn-sm remove-btn" data-index="${index}">Remove</button>
+              </td>
+            `;
+            cartItemsContainer.appendChild(row);
+
+            total += item.price * item.quantity;
+          });
+
+          totalPriceElement.innerText = `Total: ₹${total}`;
+          localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        cartItemsContainer.addEventListener('click', function (e) {
+          if (e.target.classList.contains('remove-btn')) {
+            const index = e.target.dataset.index;
+            cart.splice(index, 1); // Remove item from cart
+            updateCart();
+          }
         });
 
-        totalPriceElement.innerText = `Total: ₹${total}`;
+        checkoutButton.addEventListener('click', function () {
+          if (cart.length === 0) {
+            alert('Your cart is empty!');
+          } else {
+            alert('Proceeding to checkout!');
+            // Redirect to checkout page or perform checkout process
+            localStorage.removeItem('cart'); // Clear cart after checkout
+            updateCart();
+          }
+        });
+
+        updateCart();
       });
