@@ -40,7 +40,7 @@ html
         .collapse.navbar-collapse#navbarNav
             ul.navbar-nav.ms-auto.gap-3
                 li.nav-item.text-center
-                a.nav-link.d-flex.flex-column.align-items-center(href='#')
+                a.nav-link.d-flex.flex-column.align-items-center(href='/views/pages/cart.pug')
                     i.fas.fa-shopping-cart.fa-2x
                     span.mt-1 Cart
                     
@@ -62,44 +62,190 @@ html
             form#SignupForm
               .mb-3
                 label.form-label(for='firstName') Name
-                span.text-danger.ms-2 * 
+                span.text-danger.ms-2 *
                 .row
-                    .col-md-6
-                        input#firstName.form-control(type="text" placeholder="First Name" required)
-                    .col-md-6
-                        input#lastName.form-control(type="text" placeholder="Last Name" required)
-
+                  .col-md-6
+                    input#firstName.form-control(type="text" placeholder="Enter Your Name" required)
+                  .col-md-6
+                    input#lastName.form-control(type="text" placeholder="Enter Your Last Name" required)
+                  
+              .mb-3
+                label.form-label(for='email') Email
+                span.text-danger.ms-2 *
+                input#email.form-control(type="email" placeholder="yourmail@gmail.com" required)
 
               .mb-3
-                  label.form-label(for='email') Email
-                  span.text-danger.ms-2 * 
-                  input.form-control(type="text" placeholder="yourmail@gmail.com" required)
+                label.form-label(for='mobile') Mobile Number
+                span.text-danger.ms-2 *
+                input#mobile.form-control(type="tel" placeholder="Phone Number" required pattern="[0-9]{10}" maxlength="10")
 
-              .mb-3
-                  label.form-label(for='mobile') Mobile Number
-                  span.text-danger.ms-2 * 
-                  input#mobile.form-control(type='tel' placeholder='Phone Number' required pattern="[0-9]{10}" maxlength="10")
-              button#sendOtpBtn.btn.btn-secondary.w-100(type='button' onclick="toggleDivs()") Send OTP
-
+              button#sendOtpBtn.btn.btn-secondary.w-100(type="button" onclick="toggleDivs()") Send OTP
 
               // Upper div (initially visible)
               div#registeredDivUpper.d-flex.justify-content-between.align-items-center.mt-3
-                  p.text-muted.mb-0 If user already registered? 
-                  button.btn.btn-primary(type='button') Login
-
+                p.text-muted.mb-0 If user already registered?
+                button.btn.btn-primary(type="button" onclick="openLoginModal()") Login
               button#resendOtpBtn.btn.btn-link.d-none Resend OTP
 
               .mb-3.mt-3.d-none#otpSection
                 label.form-label(for='otp') Enter OTP
-                span.text-danger.ms-2 * 
-                input#otp.form-control(type='text' placeholder='Enter OTP' required maxlength="6")
-              button#verifyOtpBtn.btn.btn-primary.w-100.mt-3.d-none(type='button') Verify & Signup
+                span.text-danger.ms-2 *
+                input#otp.form-control(type="text" placeholder="Enter OTP" required maxlength="6")
+              button#verifyOtpBtn.btn.btn-primary.w-100.mt-3.d-none(type="button") Verify & Signup
 
               // Lower div (initially hidden)
               div#registeredDivLower.d-none.d-flex.justify-content-between.align-items-center.mt-3
-                  p.text-muted.mb-0 If user already registered?
-                  button.btn.btn-primary(type='button') Login
-            
+                p.text-muted.mb-0 If user already registered?
+                button.btn.btn-primary(type="button" onclick="openLoginModal()") Login
+          
+
+          // Login Modal
+          .modal#LoginModal(tabindex='-1' aria-labelledby='LoginModalLabel' aria-hidden='true')
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  h5#LoginModalLabel.modal-title Login with OTP
+                  button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+
+                .modal-body
+                  form#LoginForm
+                    .mb-3
+                      label.form-label(for='loginMobile') Mobile Number
+                      span.text-danger.ms-2 *
+                      input#loginMobile.form-control(type='tel' placeholder='Enter Mobile Number' required pattern="[0-9]{10}" maxlength="10")
+
+                    button#sendLoginOtpBtn.btn.btn-secondary.w-100(type='button' onclick="checkUserExists()") Send OTP
+
+                    .mb-3.mt-3.d-none#loginOtpSection
+                      label.form-label(for='loginOtp') Enter OTP
+                      span.text-danger.ms-2 *
+                      input#loginOtp.form-control(type='text' placeholder='Enter OTP' required maxlength="6")
+
+                    button#verifyLoginOtpBtn.btn.btn-primary.w-100.mt-3.d-none(type='button') Verify & Login
+
+                    div#loginErrorDiv.d-none.alert.alert-danger.mt-3 Role="alert" 
+                      | User does not exist. Please sign up first!
 
 
 
+
+script. 
+  function openLoginModal() {
+    // Get references to the modals
+    var signupModal = new bootstrap.Modal(document.getElementById('SignupModal'));
+    var loginModal = new bootstrap.Modal(document.getElementById('LoginModal'));
+
+    // Hide the Signup Modal
+    signupModal.hide();
+
+    // Wait for the Signup Modal to fully hide before showing the Login Modal
+    setTimeout(() => {
+        loginModal.show();
+    }, 300); // 300ms to match Bootstrap's modal fade-out timing
+  }
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const sendLoginOtpBtn = document.getElementById("sendLoginOtpBtn");
+    const verifyLoginOtpBtn = document.getElementById("verifyLoginOtpBtn");
+    const loginMobileInput = document.getElementById("loginMobile");
+    const loginOtpSection = document.getElementById("loginOtpSection");
+    const loginOtpInput = document.getElementById("loginOtp");
+    const loginErrorDiv = document.getElementById("loginErrorDiv");
+
+    // Utility function for alert
+    const showAlert = (message) => {
+        alert(message);
+    };
+
+    // Send OTP Logic
+    const checkUserExists = async () => {
+        const mobileNumber = loginMobileInput.value.trim();
+
+        if (!/^\d{10}$/.test(mobileNumber)) {
+            showAlert("Enter a valid 10-digit mobile number");
+            return;
+        }
+
+        try {
+            // Check if user exists in the database
+            const userCheckResponse = await axios.post("http://localhost:3000/check-user", {
+                mobile: `+91${mobileNumber}`,
+            });
+
+            if (userCheckResponse.data.exists) {
+                // User exists, send OTP
+                const otpResponse = await axios.post("http://localhost:3000/send-login-otp", {
+                    mobile: `+91${mobileNumber}`,
+                });
+
+                if (otpResponse.data.success) {
+                    showAlert("OTP sent successfully!");
+                    loginOtpSection.classList.remove("d-none");
+                    verifyLoginOtpBtn.classList.remove("d-none");
+                } else {
+                    console.error("OTP API Error:", otpResponse.data);
+                    showAlert("Error: " + otpResponse.data.message);
+                }
+            } else {
+                // User does not exist, show error div
+                loginErrorDiv.classList.remove("d-none");
+            }
+        } catch (error) {
+            if (error.response) {
+                // Server returned an error response
+                console.error("Server Error:", error.response.data);
+                showAlert("Server Error: " + (error.response.data.message || "An unexpected error occurred."));
+            } else if (error.request) {
+                // No response received from the server
+                console.error("Network Error:", error.request);
+                showAlert("Network Error: Unable to connect to the server. Please try again later.");
+            } else {
+                // Other errors
+                console.error("Error:", error.message);
+                showAlert("An unexpected error occurred. Please try again later.");
+            }
+        }
+    };
+
+    // Verify OTP Logic
+    const verifyLoginOtp = async () => {
+        const mobileNumber = loginMobileInput.value.trim();
+        const otp = loginOtpInput.value.trim();
+
+        if (!otp) {
+            showAlert("Please enter the OTP");
+            return;
+        }
+
+        try {
+            const verifyResponse = await axios.post("http://localhost:3000/verify-login-otp", {
+                mobile: `+91${mobileNumber}`,
+                otp,
+            });
+
+            if (verifyResponse.data.success) {
+                showAlert("Login successful!");
+                console.log("User Info:", verifyResponse.data.user);
+            } else {
+                console.error("Verify OTP API Error:", verifyResponse.data);
+                showAlert("Error: " + verifyResponse.data.message);
+            }
+        } catch (error) {
+            if (error.response) {
+                console.error("Server Error:", error.response.data);
+                showAlert("Server Error: " + (error.response.data.message || "An unexpected error occurred."));
+            } else if (error.request) {
+                console.error("Network Error:", error.request);
+                showAlert("Network Error: Unable to connect to the server. Please try again later.");
+            } else {
+                console.error("Error:", error.message);
+                showAlert("An unexpected error occurred while verifying the OTP.");
+            }
+        }
+    };
+
+    // Event Listeners
+    sendLoginOtpBtn.addEventListener("click", checkUserExists);
+    verifyLoginOtpBtn.addEventListener("click", verifyLoginOtp);
+  });
