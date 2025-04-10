@@ -41,12 +41,6 @@ app.get('/cart', (req, res) => {
   res.render("pages/cart"); 
 });
 
-
-app.get("/men", (req, res) => {
-  res.render("pages/men");
-});
-
-
 // Send OTP Endpoint
 app.post('/send-otp', (req, res) => {
   const { phoneNumber } = req.body;
