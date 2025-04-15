@@ -50,6 +50,8 @@ html
                     i.fas.fa-user-circle.fa-2x
                     span.mt-1 Account
 
+                
+
     // Signup Modal
     .modal#SignupModal(tabindex='-1' aria-labelledby='SignupModalLabel' aria-hidden='true')
       .modal-dialog
@@ -124,7 +126,7 @@ html
                     button#verifyLoginOtpBtn.btn.btn-primary.w-100.mt-3.d-none(type='button') Verify & Login
 
                     div#loginErrorDiv.d-none.alert.alert-danger.mt-3 Role="alert" 
-                      | User does not exist. Please sign up first!
+                    | User does not exist. Please sign up first!
 
 
 
@@ -144,108 +146,3 @@ script.
     }, 300); // 300ms to match Bootstrap's modal fade-out timing
   }
 
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const sendLoginOtpBtn = document.getElementById("sendLoginOtpBtn");
-    const verifyLoginOtpBtn = document.getElementById("verifyLoginOtpBtn");
-    const loginMobileInput = document.getElementById("loginMobile");
-    const loginOtpSection = document.getElementById("loginOtpSection");
-    const loginOtpInput = document.getElementById("loginOtp");
-    const loginErrorDiv = document.getElementById("loginErrorDiv");
-
-    // Utility function for alert
-    const showAlert = (message) => {
-        alert(message);
-    };
-
-    // Send OTP Logic
-    const checkUserExists = async () => {
-        const mobileNumber = loginMobileInput.value.trim();
-
-        if (!/^\d{10}$/.test(mobileNumber)) {
-            showAlert("Enter a valid 10-digit mobile number");
-            return;
-        }
-
-        try {
-            // Check if user exists in the database
-            const userCheckResponse = await axios.post("http://localhost:3000/check-user", {
-                mobile: `+91${mobileNumber}`,
-            });
-
-            if (userCheckResponse.data.exists) {
-                // User exists, send OTP
-                const otpResponse = await axios.post("http://localhost:3000/send-login-otp", {
-                    mobile: `+91${mobileNumber}`,
-                });
-
-                if (otpResponse.data.success) {
-                    showAlert("OTP sent successfully!");
-                    loginOtpSection.classList.remove("d-none");
-                    verifyLoginOtpBtn.classList.remove("d-none");
-                } else {
-                    console.error("OTP API Error:", otpResponse.data);
-                    showAlert("Error: " + otpResponse.data.message);
-                }
-            } else {
-                // User does not exist, show error div
-                loginErrorDiv.classList.remove("d-none");
-            }
-        } catch (error) {
-            if (error.response) {
-                // Server returned an error response
-                console.error("Server Error:", error.response.data);
-                showAlert("Server Error: " + (error.response.data.message || "An unexpected error occurred."));
-            } else if (error.request) {
-                // No response received from the server
-                console.error("Network Error:", error.request);
-                showAlert("Network Error: Unable to connect to the server. Please try again later.");
-            } else {
-                // Other errors
-                console.error("Error:", error.message);
-                showAlert("An unexpected error occurred. Please try again later.");
-            }
-        }
-    };
-
-    // Verify OTP Logic
-    const verifyLoginOtp = async () => {
-        const mobileNumber = loginMobileInput.value.trim();
-        const otp = loginOtpInput.value.trim();
-
-        if (!otp) {
-            showAlert("Please enter the OTP");
-            return;
-        }
-
-        try {
-            const verifyResponse = await axios.post("http://localhost:3000/verify-login-otp", {
-                mobile: `+91${mobileNumber}`,
-                otp,
-            });
-
-            if (verifyResponse.data.success) {
-                showAlert("Login successful!");
-                console.log("User Info:", verifyResponse.data.user);
-            } else {
-                console.error("Verify OTP API Error:", verifyResponse.data);
-                showAlert("Error: " + verifyResponse.data.message);
-            }
-        } catch (error) {
-            if (error.response) {
-                console.error("Server Error:", error.response.data);
-                showAlert("Server Error: " + (error.response.data.message || "An unexpected error occurred."));
-            } else if (error.request) {
-                console.error("Network Error:", error.request);
-                showAlert("Network Error: Unable to connect to the server. Please try again later.");
-            } else {
-                console.error("Error:", error.message);
-                showAlert("An unexpected error occurred while verifying the OTP.");
-            }
-        }
-    };
-
-    // Event Listeners
-    sendLoginOtpBtn.addEventListener("click", checkUserExists);
-    verifyLoginOtpBtn.addEventListener("click", verifyLoginOtp);
-  });

@@ -27,8 +27,7 @@ const userSchema = new mongoose.Schema({
     mobile: {
         type: String,
         required: true,
-        unique: true, // Enforces unique mobile numbers
-        match: [/^\d{10}$/, 'Please enter a valid 10-digit phone number']
+        unique: true // Enforces unique mobile numbe
     },
     
     createdAt: {

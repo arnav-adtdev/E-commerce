@@ -1,0 +1,120 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title Checkout
+    link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css")
+    style.
+      body {
+        background-color: #f8f9fa;
+      }
+      .card {
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+      }
+      .btn-success:hover {
+        background-color: #28a745;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      }
+  body
+    .container.mt-5
+      h1.text-center.mb-4 Checkout
+
+      .row.g-4
+        .col-md-6
+          .card.p-4
+            h3 Your Order Summary
+            .table-responsive
+              table.table.table-striped.text-center
+                thead.bg-dark.text-white
+                  tr
+                    th Product Name
+                    th Price
+                    th Quantity
+                    th Total
+                tbody#checkout-items
+            p#checkout-total.fw-bold.fs-5.mt-3.text-danger
+
+        .col-md-6
+          .card.p-4
+            h3 Billing Details
+            form#billing-form
+              .mb-3
+                label.form-label Full Name
+                input.form-control(name="fullname" type="text" required)
+              .mb-3
+                label.form-label Email
+                input.form-control(name="email" type="email" required)
+              .mb-3
+                label.form-label Address
+                textarea.form-control(name="address" rows="3" required)
+              .mb-3
+                label.form-label Payment Method
+                select.form-select(name="payment-method")
+                  option(value="credit-card") Credit Card
+                  option(value="paypal") PayPal
+                  option(value="upi") UPI
+                  option(value="cash-on-delivery") Cash on Delivery
+              button.btn.btn-success.btn-lg.w-100#checkout-btn Proceed to Pay
+
+    script.
+      document.addEventListener("DOMContentLoaded", function () {
+          const checkoutItemsContainer = document.getElementById("checkout-items");
+          const checkoutTotalElement = document.getElementById("checkout-total");
+          const checkoutButton = document.getElementById("checkout-btn");
+
+          const discountAmount = 58.00;
+          const deliveryCharge = 40.00;
+
+          let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+          function loadCheckout() {
+              checkoutItemsContainer.innerHTML = "";
+              let total = 0;
+
+              if (cart.length === 0) {
+                  checkoutItemsContainer.innerHTML = `<tr><td colspan="4" class="text-center text-muted fs-5">No items in cart</td></tr>`;
+                  checkoutTotalElement.innerText = "Total: ₹0";
+                  return;
+              }
+
+              cart.forEach((item) => {
+                  const row = document.createElement("tr");
+                  const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
+                  row.innerHTML = `
+                      <td>${item.name}</td>
+                      <td>₹${item.price}</td>
+                      <td>${item.quantity}</td>
+                      <td>₹${itemTotal}</td>
+                  `;
+                  checkoutItemsContainer.appendChild(row);
+                  total += parseFloat(itemTotal);
+              });
+
+              // Apply delivery charge
+              let finalAmount = total + deliveryCharge;
+
+              // Retrieve if discount was applied from localStorage
+              const discountApplied = JSON.parse(localStorage.getItem("discountApplied")) || false;
+              if (discountApplied) {
+                  finalAmount -= discountAmount;
+              }
+
+              checkoutTotalElement.innerText = `Total Amount Payable: ₹${finalAmount.toFixed(2)}`;
+          }
+
+          checkoutButton.addEventListener("click", function () {
+              if (cart.length === 0) {
+                  alert("Your cart is empty!");
+                  return;
+              }
+              alert("Proceeding to payment...");
+              localStorage.removeItem("cart");
+              localStorage.removeItem("discountApplied");
+              window.location.href = "/thank-you";
+          });
+
+          loadCheckout();
+      });
+

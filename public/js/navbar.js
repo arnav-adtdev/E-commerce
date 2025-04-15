@@ -11,9 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const lowerDiv = document.getElementById("registeredDivLower");
 
     // Utility function to show alerts
-    const showAlert = (message) => {
-        alert(message);
-    };
+    const showAlert = (message) => alert(message);
 
     // Geolocation Logic
     const initializeGeolocation = () => {
@@ -27,13 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then((data) => {
                             locationSpan.textContent = data.display_name || "Location not found";
                         })
-                        .catch(() => {
+                        .catch((error) => {
+                            console.error("Location API Error:", error);
                             locationSpan.textContent = "Unable to get location";
                         });
                 },
                 (error) => {
+                    const geolocationErrorMessages = {
+                        1: "Location access denied by user.",
+                        2: "Unable to retrieve location information.",
+                        3: "Location request timed out.",
+                    };
                     console.error("Geolocation error:", error);
-                    locationSpan.textContent = "Location access denied";
+                    locationSpan.textContent = geolocationErrorMessages[error.code] || "Unknown error occurred.";
                 }
             );
         } else {
@@ -44,33 +48,39 @@ document.addEventListener("DOMContentLoaded", () => {
     // Send OTP Logic
     const handleSendOtp = async () => {
         const phoneNumber = mobileInput.value.trim();
-
+    
+        // Validate phone number format
         if (!/^\d{10}$/.test(phoneNumber)) {
             showAlert("Enter a valid 10-digit mobile number");
             return;
         }
-
+    
+        // Prepend country code
+        const formattedPhoneNumber = `+91${phoneNumber}`;
+    
         try {
-            const response = await axios.post("http://localhost:3000/send-otp", { phoneNumber: `+91${phoneNumber}` });
+            const response = await axios.post("http://localhost:3000/send-otp", { phoneNumber: formattedPhoneNumber });
+    
             if (response.data.success) {
                 showAlert("OTP sent successfully!");
-
-                // Show OTP section and Verify button
                 otpSection.classList.remove("d-none");
                 verifyOtpBtn.classList.remove("d-none");
-
-                toggleDivs(); // Switch Upper and Lower Divs
-
-                // Timer logic for Resend OTP button
-                initializeResendOtpTimer();
             } else {
+                // Handle backend-sent errors explicitly
                 showAlert(`Error: ${response.data.message}`);
             }
         } catch (error) {
-            console.error("API Error:", error);
-            showAlert(`Error sending OTP: ${error.message}`);
+            // Handle all error cases, including validation and connection issues
+            console.error("API Error:", error.response?.data || error.message);
+            if (error.response && error.response.data && error.response.data.message) {
+                showAlert(`Error: ${error.response.data.message}`);
+            } else {
+                showAlert(`Error sending OTP: ${error.message}`);
+            }
         }
     };
+    
+    
 
     // Timer for Resend OTP
     const initializeResendOtpTimer = () => {
@@ -82,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (countdown > 0) {
                 const minutes = Math.floor(countdown / 60);
                 const seconds = countdown % 60;
-                resendOtpBtn.textContent = `Resend OTP (${minutes}:${seconds < 10 ? "0" : ""}${seconds})`;
+                resendOtpBtn.textContent = `Resend OTP (${minutes}:${seconds.toString().padStart(2, '0')})`;
                 countdown--;
             } else {
                 clearInterval(timerInterval);
@@ -112,6 +122,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        if (!/^\d{6}$/.test(otp)) { // Assuming OTP is a 6-digit number
+            showAlert("Please enter a valid 6-digit OTP.");
+            return;
+        }
+
         try {
             const response = await axios.post("http://localhost:3000/save-user", {
                 firstName,
@@ -128,8 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 showAlert(`Error: ${response.data.message}`);
             }
         } catch (error) {
-            console.error("Error saving user:", error);
-            showAlert(`Error: ${error.message}`);
+            console.error("Error saving user:", error.response?.data || error.message);
+            showAlert(`Error: ${error.response?.data?.message || error.message}`);
         }
     };
 
