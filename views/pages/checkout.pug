@@ -10,21 +10,45 @@ html(lang="en")
         background-color: #f8f9fa;
       }
       .card {
-        box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+        border-radius: 10px;
+        transition: transform 0.3s ease-in-out;
+      }
+      .card:hover {
+        transform: scale(1.02);
+      }
+      .btn-success {
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 12px;
+        width: 100%;
+        transition: all 0.3s ease-in-out;
       }
       .btn-success:hover {
         background-color: #28a745;
-        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+      }
+      .table {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      th, td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 12px;
+      }
+      .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px;
       }
   body
     .container.mt-5
-      h1.text-center.mb-4 Checkout
+      h1.text-center.text-primary.mb-4 Checkout
 
       .row.g-4
         .col-md-6
           .card.p-4
-            h3 Your Order Summary
+            h3.text-dark Your Order Summary
             .table-responsive
               table.table.table-striped.text-center
                 thead.bg-dark.text-white
@@ -34,87 +58,195 @@ html(lang="en")
                     th Quantity
                     th Total
                 tbody#checkout-items
-            p#checkout-total.fw-bold.fs-5.mt-3.text-danger
-
+            p#checkout-total.fw-bold.fs-5.text-danger.mt-3 Total Amount Payable: ₹0
+           
         .col-md-6
           .card.p-4
-            h3 Billing Details
+            h3.text-dark Billing Details
+            #saved-address.alert.alert-info.p-3.fw-bold(style="display: none") Your saved address will appear here.
+
             form#billing-form
+              .row.mb-3
+                .col-md-6
+                  .form-floating
+                    input.form-control(name="fullname" type="text" placeholder="Full Name" required)
+                    label(for="fullname") Full Name :
+                .col-md-6
+                  .form-floating
+                    input.form-control(name="phone" type="tel" placeholder="Phone Number" required)
+                    label(for="phone") Phone Number :
+
+              .row.mb-3
+                .col-12.col-md-6
+                  .form-floating
+                    input.form-control(name="pincode" type="text" placeholder="Pincode" required)
+                    label(for="pincode") Pincode :
+                .col-12.col-md-6
+                  .form-floating
+                    select.form-select(name="state" id="state" required onchange="updateCities()")
+                      option(value="" disabled selected) Select State
+                      option(value="Andhra Pradesh") Andhra Pradesh
+                      option(value="Arunachal Pradesh") Arunachal Pradesh
+                      option(value="Assam") Assam
+                      option(value="Bihar") Bihar
+                      option(value="Chhattisgarh") Chhattisgarh
+                      option(value="Goa") Goa
+                      option(value="Gujarat") Gujarat
+                      option(value="Haryana") Haryana
+                      option(value="Himachal Pradesh") Himachal Pradesh
+                      option(value="Jharkhand") Jharkhand
+                      option(value="Karnataka") Karnataka
+                      option(value="Kerala") Kerala
+                      option(value="Madhya Pradesh") Madhya Pradesh
+                      option(value="Maharashtra") Maharashtra
+                      option(value="Manipur") Manipur
+                      option(value="Meghalaya") Meghalaya
+                      option(value="Mizoram") Mizoram
+                      option(value="Nagaland") Nagaland
+                      option(value="Odisha") Odisha
+                      option(value="Punjab") Punjab
+                      option(value="Rajasthan") Rajasthan
+                      option(value="Sikkim") Sikkim
+                      option(value="Tamil Nadu") Tamil Nadu
+                      option(value="Telangana") Telangana
+                      option(value="Tripura") Tripura
+                      option(value="Uttar Pradesh") Uttar Pradesh
+                      option(value="Uttarakhand") Uttarakhand
+                      option(value="West Bengal") West Bengal
+                    label(for="state") State :
+
+
+
+              .row.mb-3
+                .col-md-6
+                  .form-floating
+                    input.form-control(name="house" type="text" placeholder="House No." required)
+                    label(for="city") City :
+                .col-md-6
+                  .form-floating
+                    input.form-control(name="house" type="text" placeholder="House No." required)
+                    label(for="house") House No. :
+
               .mb-3
-                label.form-label Full Name
-                input.form-control(name="fullname" type="text" required)
+                .form-floating
+                  input.form-control(name="road" type="text" placeholder="Road Name" required)
+                  label(for="road") Road Name :
+
+              button.btn.btn-secondary.btn-lg.w-100#save-address-btn(type="button") Save Address
+
+              #payment-section(style="display: none")
+                .mb-3
+                  label.form-label Payment Method
+                  select.form-select#payment-method(name="payment-method")
+                    option(value="credit-card") Credit Card
+                    option(value="paypal") PayPal
+                    option(value="upi") UPI
+                    option(value="cash-on-delivery") Cash on Delivery
+
+                button.btn.btn-success.btn-lg.w-100#checkout-btn Proceed to Pay
+
+
               .mb-3
-                label.form-label Email
-                input.form-control(name="email" type="email" required)
-              .mb-3
-                label.form-label Address
-                textarea.form-control(name="address" rows="3" required)
+                input#discount-checkbox.form-check-input(type="checkbox")
+                label.form-check-label(for="discount-checkbox") Use Loyalty points worth Rs. 58.00
+
               .mb-3
                 label.form-label Payment Method
-                select.form-select(name="payment-method")
+                select.form-select#payment-method(name="payment-method")
                   option(value="credit-card") Credit Card
                   option(value="paypal") PayPal
                   option(value="upi") UPI
                   option(value="cash-on-delivery") Cash on Delivery
+
               button.btn.btn-success.btn-lg.w-100#checkout-btn Proceed to Pay
+
 
     script.
       document.addEventListener("DOMContentLoaded", function () {
-          const checkoutItemsContainer = document.getElementById("checkout-items");
-          const checkoutTotalElement = document.getElementById("checkout-total");
-          const checkoutButton = document.getElementById("checkout-btn");
+        const checkoutItemsContainer = document.getElementById("checkout-items");
+        const checkoutTotalElement = document.getElementById("checkout-total");
+        const discountCheckbox = document.getElementById("discount-checkbox");
+        const checkoutButton = document.getElementById("checkout-btn");
+        const saveAddressButton = document.getElementById("save-address-btn");
+        const savedAddressContainer = document.getElementById("saved-address");
+        const paymentSection = document.getElementById("payment-section");
 
-          const discountAmount = 58.00;
-          const deliveryCharge = 40.00;
+        const discountAmount = 58.00;
+        const deliveryCharge = 40.00;
+        let cart = JSON.parse(localStorage.getItem("checkoutCart")) || [];
+        let loyaltyRs = parseFloat(localStorage.getItem("loyaltyRs")) || 0;
 
-          let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        function updateCheckoutTotal() {
+            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            let finalAmount = total + deliveryCharge;
 
-          function loadCheckout() {
-              checkoutItemsContainer.innerHTML = "";
-              let total = 0;
+            if (discountCheckbox.checked) {
+                finalAmount -= discountAmount;
+            }
 
-              if (cart.length === 0) {
-                  checkoutItemsContainer.innerHTML = `<tr><td colspan="4" class="text-center text-muted fs-5">No items in cart</td></tr>`;
-                  checkoutTotalElement.innerText = "Total: ₹0";
-                  return;
-              }
+            finalAmount -= loyaltyRs;
+            checkoutTotalElement.innerText = `Total Amount Payable: ₹${finalAmount.toFixed(2)}`;
+            localStorage.setItem("discountApplied", discountCheckbox.checked);
+        }
 
-              cart.forEach((item) => {
-                  const row = document.createElement("tr");
-                  const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
-                  row.innerHTML = `
-                      <td>${item.name}</td>
-                      <td>₹${item.price}</td>
-                      <td>${item.quantity}</td>
-                      <td>₹${itemTotal}</td>
-                  `;
-                  checkoutItemsContainer.appendChild(row);
-                  total += parseFloat(itemTotal);
-              });
+        function loadCheckout() {
+            checkoutItemsContainer.innerHTML = "";
+            if (cart.length === 0) {
+                checkoutItemsContainer.innerHTML = `<tr><td colspan="4" class="text-center text-muted fs-5">No items in cart</td></tr>`;
+                checkoutTotalElement.innerText = "Total Amount Payable: ₹0";
+                return;
+            }
 
-              // Apply delivery charge
-              let finalAmount = total + deliveryCharge;
+            cart.forEach((item) => {
+                const row = document.createElement("tr");
+                const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>₹${item.price}</td>
+                    <td>${item.quantity}</td>
+                    <td>₹${itemTotal}</td>
+                `;
+                checkoutItemsContainer.appendChild(row);
+            });
 
-              // Retrieve if discount was applied from localStorage
-              const discountApplied = JSON.parse(localStorage.getItem("discountApplied")) || false;
-              if (discountApplied) {
-                  finalAmount -= discountAmount;
-              }
+            updateCheckoutTotal();
+        }
 
-              checkoutTotalElement.innerText = `Total Amount Payable: ₹${finalAmount.toFixed(2)}`;
-          }
+        discountCheckbox.checked = JSON.parse(localStorage.getItem("discountApplied")) || false;
+        discountCheckbox.addEventListener("change", updateCheckoutTotal);
 
-          checkoutButton.addEventListener("click", function () {
-              if (cart.length === 0) {
-                  alert("Your cart is empty!");
-                  return;
-              }
-              alert("Proceeding to payment...");
-              localStorage.removeItem("cart");
-              localStorage.removeItem("discountApplied");
-              window.location.href = "/thank-you";
-          });
+        checkoutButton.addEventListener("click", function () {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            alert("Proceeding to payment...");
+            localStorage.removeItem("checkoutCart");
+            localStorage.removeItem("discountApplied");
+            localStorage.removeItem("loyaltyRs");
+            window.location.href = "/thank-you";
+        });
 
-          loadCheckout();
+        saveAddressButton.addEventListener("click", function () {
+            const fullName = document.querySelector("input[name='fullname']").value;
+            const phone = document.querySelector("input[name='phone']").value;
+            const pincode = document.querySelector("input[name='pincode']").value;
+            const state = document.getElementById("state").value;
+            const city = document.getElementById("city").value;
+            const house = document.querySelector("input[name='house']").value;
+            const road = document.querySelector("input[name='road']").value;
+
+            if (!fullName || !phone || !pincode || !state || !city || !house || !road) {
+                alert("Please fill in all details before saving.");
+                return;
+            }
+
+            const savedAddress = `${fullName}, ${phone}, ${house}, ${road}, ${city}, ${state} - ${pincode}`;
+            savedAddressContainer.innerText = `Saved Address: ${savedAddress}`;
+            savedAddressContainer.style.display = "block";
+            paymentSection.style.display = "block";
+        });
+
+        loadCheckout();
       });
 
