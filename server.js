@@ -52,6 +52,10 @@ app.get('/checkout', (req, res) => {
   res.render("pages/checkout");
 });
 
+app.get('/payment', (req, res) => {
+  res.render("pages/payment");
+});
+
 app.get("/men", (req, res) => {
   res.render("pages/men");
 });
