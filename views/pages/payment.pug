@@ -114,7 +114,7 @@ html(lang="en")
             }
 
             let transactionId = "TXN" + Date.now();
-            let amountElement = document.getElementById("checkoutTotal"); // Ensure this exists in your page
+            let amountElement = document.getElementById("checkout"); // Ensure this exists in your page
             let amount = amountElement ? amountElement.innerText.trim() : "0";
 
             if (!amount || isNaN(parseFloat(amount))) {
