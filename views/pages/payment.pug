@@ -5,11 +5,13 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     title Payment Options
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css")
-    link(rel="stylesheet", href="/css/payment.css")
-    script(src="https://checkout.razorpay.com/v1/checkout.js")
+    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
+    
     style.
       body {
         background-color: #f8f9fa;
+        font-family: 'Poppins', sans-serif;
       }
       .container {
         max-width: 800px;
@@ -18,17 +20,43 @@ html(lang="en")
       .card {
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
       }
-      #qr-container {
-        display: none;
-        text-align: center;
+      .card:hover {
+        transform: scale(1.02);
+      }
+      button {
+        font-size: 16px;
+        font-weight: 600;
+        transition: opacity 0.3s;
+      }
+      button:hover {
+        opacity: 0.85;
+      }
+      .modal-header {
+        background-color: #dc3545;
+        color: #fff;
       }
       #countdown {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
-        color: red;
+        color: #ff5733;
       }
+      .payment-icons i {
+        font-size: 2rem;
+        margin: 10px;
+        color: #007bff;
+      }
+      .payment-icons img {
+          margin: 10px;
+          transition: transform 0.3s ease-in-out;
+      }
+
+      .payment-icons img:hover {
+          transform: scale(1.1);
+      }
+
 
   body
     .container.mt-5
@@ -44,9 +72,6 @@ html(lang="en")
               button.btn.btn-info.btn-md#verify-upi(type="button") Verify
             br
             button.btn.btn-primary.btn-lg.w-100#pay-upi(type="button" disabled) Pay via UPI
-
-
-
 
         //- Razorpay Card Payment
         .col-md-6
@@ -66,11 +91,24 @@ html(lang="en")
             h3.text-dark Pay on Delivery (COD)
             button.btn.btn-secondary.btn-lg.w-100#pay-cod(type="button") Cash on Delivery
 
-      // QR Code Display Section
-      #qr-container.card.mt-4
-        h3.text-danger Scan the QR Code Now!
-        img.img-fluid#qr-image(src="/img/qr.jpg", alt="Scan to Pay")
-        h4#countdown.text-dark(style="margin-top:10px;") Time remaining: 5:00
+      // QR Code Modal
+      .modal.fade#qrModal(tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true")
+        .modal-dialog
+          .modal-content
+            .modal-header
+              h5.modal-title.text-danger#qrModalLabel Total Amount
+              button.btn-close(data-bs-dismiss="modal" aria-label="Close")
+            .modal-body.text-center
+              h5 Scan QR code using BHIM or Your <br>preferred UPI app
+              div.d-flex.justify-content-center.align-items-center.payment-icons
+                img(src="https://cdn.worldvectorlogo.com/logos/google-pay-2.svg", alt="Google Pay", width="40")
+                img(src="https://cdn.worldvectorlogo.com/logos/phonepe-1.svg", alt="PhonePe", width="40")
+                img(src="https://sc.filehippo.net/images/t_app-icon-l/p/fe0e8ca6-a4f1-11e6-87cf-00163ed833e7/1148601929/paytm-logo", alt="Paytm", width="40")
+                img(src="https://www.uxdt.nic.in/wp-content/uploads/2020/06/BHIM_Preview.png?x76268", alt="BHIM Pay", width="40")
+
+
+              img.img-fluid#qr-image(src="/img/qr.jpg", alt="Scan to Pay")
+              h4.mt-3#countdown This QR code will expire in: 5:00
 
     script.
       document.addEventListener("DOMContentLoaded", function () {
@@ -114,7 +152,7 @@ html(lang="en")
             }
 
             let transactionId = "TXN" + Date.now();
-            let amountElement = document.getElementById("checkout"); // Ensure this exists in your page
+            let amountElement = document.getElementById("checkoutTotal"); // Ensure this exists in your page
             let amount = amountElement ? amountElement.innerText.trim() : "0";
 
             if (!amount || isNaN(parseFloat(amount))) {
@@ -158,28 +196,26 @@ html(lang="en")
 
           // QR Code Payment with 5-minute countdown timer
           qrButton.addEventListener("click", function () {
-              hidePreviousMethod();
-              latestPaymentMethod = qrContainer;
+            const qrModal = new bootstrap.Modal(document.getElementById("qrModal"));
+            qrModal.show(); // Show the QR modal
 
-              qrContainer.style.display = "block";
-              alert("Please scan the QR code to proceed with payment.");
+            alert("Please scan the QR code to proceed with payment.");
 
-              let timeLeft = 300; // 5 minutes
+            let timeLeft = 300; // 5 minutes
 
-              const timerInterval = setInterval(function () {
-                  let minutes = Math.floor(timeLeft / 60);
-                  let seconds = timeLeft % 60;
-                  countdownDisplay.innerText = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            const timerInterval = setInterval(function () {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                countdownDisplay.innerText = `This QR code will exprie in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                timeLeft--;
 
-                  timeLeft--;
-
-                  if (timeLeft < 0) {
-                      clearInterval(timerInterval);
-                      alert("Payment session expired! Please try again.");
-                      qrContainer.style.display = "none";
-                  }
-              }, 1000); // Update every second
-          });
+                if (timeLeft < 0) {
+                    clearInterval(timerInterval);
+                    alert("Payment session expired! Please try again.");
+                    qrModal.hide(); // Close the modal after timeout
+                }
+            }, 1000); // Update every second
+        });
 
           // Cash on Delivery Payment
           codButton.addEventListener("click", function () {
