@@ -117,7 +117,8 @@ html(lang="en")
             }
 
             let transactionId = "TXN" + Date.now();
-            let amount = document.getElementById("checkoutTotal").innerText; // Fetch dynamic amount
+            let amount = document.getElementById("checkoutTotal").innerText.trim(); // Fetch dynamic amount
+
             if (!amount || isNaN(parseFloat(amount))) {
                 alert("Invalid amount detected.");
                 return;
@@ -127,6 +128,7 @@ html(lang="en")
 
             window.open(upiUrl, "_self");
         });
+
 
 
           // Razorpay Card Payment
