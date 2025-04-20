@@ -107,21 +107,27 @@ html(lang="en")
 
           // UPI Payment Redirect
           upiButton.addEventListener("click", function () {
-              hidePreviousMethod();
-              latestPaymentMethod = upiButton;
+            hidePreviousMethod();
+            latestPaymentMethod = upiButton;
 
-              let upiValue = upiInput.value.trim();
-              if (!upiValue || !upiValue.includes("@")) {
-                  alert("Please enter a valid UPI ID.");
-                  return;
-              }
+            let upiValue = upiInput.value.trim();
+            if (!upiValue || !upiValue.includes("@")) {
+                alert("Please enter a valid UPI ID.");
+                return;
+            }
 
-              let transactionId = "TXN" + Date.now();
-              let amount = 1753.00;
-              let upiUrl = `upi://pay?pa=${upiValue}&pn=Your Store&mc=0000&tid=${transactionId}&tr=${transactionId}&tn=Order Payment&am=${amount}&cu=INR`;
+            let transactionId = "TXN" + Date.now();
+            let amount = document.getElementById("checkoutTotal").innerText; // Fetch dynamic amount
+            if (!amount || isNaN(parseFloat(amount))) {
+                alert("Invalid amount detected.");
+                return;
+            }
 
-              window.open(upiUrl, "_self");
-          });
+            let upiUrl = `upi://pay?pa=${upiValue}&pn=Your Store&mc=0000&tid=${transactionId}&tr=${transactionId}&tn=Order Payment&am=${amount}&cu=INR`;
+
+            window.open(upiUrl, "_self");
+        });
+
 
           // Razorpay Card Payment
           cardButton.addEventListener("click", function () {
