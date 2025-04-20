@@ -107,9 +107,6 @@ html(lang="en")
 
           // UPI Payment Redirect
           upiButton.addEventListener("click", function () {
-            hidePreviousMethod();
-            latestPaymentMethod = upiButton;
-
             let upiValue = upiInput.value.trim();
             if (!upiValue || !upiValue.includes("@")) {
                 alert("Please enter a valid UPI ID.");
@@ -117,7 +114,8 @@ html(lang="en")
             }
 
             let transactionId = "TXN" + Date.now();
-            let amount = document.getElementById("checkoutTotal").innerText.trim(); // Fetch dynamic amount
+            let amountElement = document.getElementById("checkoutTotal"); // Ensure this exists in your page
+            let amount = amountElement ? amountElement.innerText.trim() : "0";
 
             if (!amount || isNaN(parseFloat(amount))) {
                 alert("Invalid amount detected.");
@@ -126,7 +124,8 @@ html(lang="en")
 
             let upiUrl = `upi://pay?pa=${upiValue}&pn=Your Store&mc=0000&tid=${transactionId}&tr=${transactionId}&tn=Order Payment&am=${amount}&cu=INR`;
 
-            window.open(upiUrl, "_self");
+            console.log("UPI URL:", upiUrl); // Debugging
+            window.location.href = upiUrl; // Redirect to UPI app
         });
 
 
