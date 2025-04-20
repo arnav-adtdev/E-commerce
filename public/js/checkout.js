@@ -66,9 +66,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const stateCities = {
-            "Uttar Pradesh": ["Lucknow", "Noida", "Kanpur", "Deorai", "Salempur"],
-            "Delhi": ["New Delhi", "Dwarka", "Saket"],
-            "Maharashtra": ["Mumbai", "Pune", "Nagpur"]
+            "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Tirupati"],
+            "Arunachal Pradesh": ["Itanagar", "Tawang", "Ziro", "Pasighat"],
+            "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat"],
+            "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur"],
+            "Chhattisgarh": ["Raipur", "Bilaspur", "Durg", "Korba"],
+            "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa"],
+            "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
+            "Haryana": ["Faridabad", "Gurgaon", "Panipat", "Ambala"],
+            "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala", "Kullu"],
+            "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro"],
+            "Karnataka": ["Bangalore", "Mysore", "Mangalore", "Hubli"],
+            "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur"],
+            "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur"],
+            "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+            "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Churachandpur"],
+            "Meghalaya": ["Shillong", "Tura", "Jowai", "Nongpoh"],
+            "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Serchhip"],
+            "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Zunheboto"],
+            "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Puri"],
+            "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala"],
+            "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota"],
+            "Sikkim": ["Gangtok", "Namchi", "Gyalshing", "Mangan"],
+            "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli"],
+            "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar"],
+            "Tripura": ["Agartala", "Dharmanagar", "Udaipur", "Kailashahar"],
+            "Uttar Pradesh": ["Lucknow", "Noida", "Kanpur", "Agra", "Varanasi"],
+            "Uttarakhand": ["Dehradun", "Haridwar", "Rishikesh", "Haldwani"],
+            "West Bengal": ["Kolkata", "Darjeeling", "Asansol", "Howrah"]
+            
         };
 
         cityInput.innerHTML = `<option value="" disabled selected>Select City</option>`;

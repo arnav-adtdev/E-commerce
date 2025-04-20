@@ -2,88 +2,184 @@ doctype html
 html(lang="en")
   head
     meta(charset="UTF-8")
-    meta(name="viewport" content="width=device-width, initial-scale=1.0")
-    title Payment
-    link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Payment Options
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css")
     link(rel="stylesheet", href="/css/payment.css")
-    script(src="https://checkout.razorpay.com/v1/checkout.js") 
-    //- script(src="/js/payment.js") 
+    script(src="https://checkout.razorpay.com/v1/checkout.js")
+    style.
+      body {
+        background-color: #f8f9fa;
+      }
+      .container {
+        max-width: 800px;
+        margin-top: 50px;
+      }
+      .card {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      #qr-container {
+        display: none;
+        text-align: center;
+      }
+      #countdown {
+        font-size: 20px;
+        font-weight: bold;
+        color: red;
+      }
 
   body
     .container.mt-5
       h1.text-center.text-primary.mb-4 Payment Options
 
       .row.g-4
+        //- UPI Payment
         .col-md-6
           .card.p-4
-            select#upi-select.form-select.ms-3   
+            h3.text-dark Pay via UPI
+            .d-flex.align-items-center
+              input#upi-id.form-control.me-2(type="text", placeholder="Enter your UPI ID (e.g., yourid@upi)")
+              button.btn.btn-info.btn-md#verify-upi(type="button") Verify
+            br
+            button.btn.btn-primary.btn-lg.w-100#pay-upi(type="button" disabled) Pay via UPI
 
 
+
+
+        //- Razorpay Card Payment
         .col-md-6
           .card.p-4
             h3.text-dark Pay with Credit/Debit Card
             button.btn.btn-success.btn-lg.w-100#pay-card(type="button") Pay via Card
 
+        //- QR Code Payment
         .col-md-6
           .card.p-4
             h3.text-dark Scan to Pay (QR Code)
-            img.img-fluid(src="/img/qr.jpg", alt="Scan to Pay")
             button.btn.btn-warning.btn-lg.w-100#pay-qr(type="button") Pay via QR Code
 
+        //- Cash on Delivery (COD)
         .col-md-6
           .card.p-4
             h3.text-dark Pay on Delivery (COD)
             button.btn.btn-secondary.btn-lg.w-100#pay-cod(type="button") Cash on Delivery
 
-script. 
-    document.addEventListener("DOMContentLoaded", function () {
-        const upiButton = document.getElementById("pay-upi");
-        const cardButton = document.getElementById("pay-card");
-        const qrButton = document.getElementById("pay-qr");
-        const codButton = document.getElementById("pay-cod");
+      // QR Code Display Section
+      #qr-container.card.mt-4
+        h3.text-danger Scan the QR Code Now!
+        img.img-fluid#qr-image(src="/img/qr.jpg", alt="Scan to Pay")
+        h4#countdown.text-dark(style="margin-top:10px;") Time remaining: 5:00
 
-        // UPI Payment Redirect
-        upiButton.addEventListener("click", function () {
-            let upiId = "your-upi-id@phonepe"; // Replace with actual UPI ID
-            let amount = 1753.00;
-            let transactionId = "TXN" + Date.now();
-            let url = `upi://pay?pa=${upiId}&pn=Your Store&mc=0000&tid=${transactionId}&tr=${transactionId}&tn=Order Payment&am=${amount}&cu=INR`;
-            window.location.href = url;
-        });
+    script.
+      document.addEventListener("DOMContentLoaded", function () {
+          const upiButton = document.getElementById("pay-upi");
+          const cardButton = document.getElementById("pay-card");
+          const qrButton = document.getElementById("pay-qr");
+          const codButton = document.getElementById("pay-cod");
+          const upiInput = document.getElementById("upi-id");
+          const verifyButton = document.getElementById("verify-upi");
+          const qrContainer = document.getElementById("qr-container");
+          const countdownDisplay = document.getElementById("countdown");
 
-        // Razorpay Card Payment
-        cardButton.addEventListener("click", function () {
-            var options = {
-                key: "YOUR_RAZORPAY_KEY", // Get this from Razorpay Dashboard
-                amount: 175300, // Convert ₹1753 to paisa (multiply by 100)
-                currency: "INR",
-                name: "Your Store",
-                description: "Order Payment",
-                image: "/path-to-your-logo.png",
-                handler: function (response) {
-                    alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                    window.location.href = "/thank-you";
-                },
-                prefill: {
-                    name: "Arnav",
-                    email: "user@example.com",
-                    contact: "07068361837"
-                },
-                theme: { color: "#3399cc" }
-            };
-            
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
-        });
+          let latestPaymentMethod = null; // Track the latest payment method
 
-        // QR Code Payment
-        qrButton.addEventListener("click", function () {
-            alert("Please scan the QR code to proceed with payment.");
-        });
+          function hidePreviousMethod() {
+              if (latestPaymentMethod) {
+                  latestPaymentMethod.style.display = "none";
+              }
+          }
 
-        // Cash on Delivery (COD)
-        codButton.addEventListener("click", function () {
-            alert("Order placed successfully with Cash on Delivery.");
-            window.location.href = "/thank-you";
-        });
-    });
+          // Verify UPI ID Before Allowing Payment
+          verifyButton.addEventListener("click", function () {
+              let upiValue = upiInput.value.trim();
+              let upiPattern = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/;
+
+              if (!upiPattern.test(upiValue)) {
+                  alert("Invalid UPI ID! Please enter a valid UPI ID.");
+                  upiButton.disabled = true;
+              } else {
+                  alert("UPI ID Verified!");
+                  upiButton.disabled = false;
+              }
+          });
+
+          // UPI Payment Redirect
+          upiButton.addEventListener("click", function () {
+              hidePreviousMethod();
+              latestPaymentMethod = upiButton;
+
+              let upiValue = upiInput.value.trim();
+              if (!upiValue || !upiValue.includes("@")) {
+                  alert("Please enter a valid UPI ID.");
+                  return;
+              }
+
+              let transactionId = "TXN" + Date.now();
+              let amount = 1753.00;
+              let upiUrl = `upi://pay?pa=${upiValue}&pn=Your Store&mc=0000&tid=${transactionId}&tr=${transactionId}&tn=Order Payment&am=${amount}&cu=INR`;
+
+              window.open(upiUrl, "_self");
+          });
+
+          // Razorpay Card Payment
+          cardButton.addEventListener("click", function () {
+              hidePreviousMethod();
+              latestPaymentMethod = cardButton;
+
+              let amount = 1753.00;
+
+              var options = {
+                  key: "YOUR_RAZORPAY_KEY",
+                  amount: amount * 100,
+                  currency: "INR",
+                  name: "Your Store",
+                  description: "Order Payment",
+                  image: "/path-to-your-logo.png",
+                  handler: function (response) {
+                      alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                      window.location.href = "/thank-you";
+                  },
+                  prefill: { name: "Arnav", email: "user@example.com", contact: "07068361837" },
+                  theme: { color: "#3399cc" }
+              };
+
+              var rzp1 = new Razorpay(options);
+              rzp1.open();
+          });
+
+          // QR Code Payment with 5-minute countdown timer
+          qrButton.addEventListener("click", function () {
+              hidePreviousMethod();
+              latestPaymentMethod = qrContainer;
+
+              qrContainer.style.display = "block";
+              alert("Please scan the QR code to proceed with payment.");
+
+              let timeLeft = 300; // 5 minutes
+
+              const timerInterval = setInterval(function () {
+                  let minutes = Math.floor(timeLeft / 60);
+                  let seconds = timeLeft % 60;
+                  countdownDisplay.innerText = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                  timeLeft--;
+
+                  if (timeLeft < 0) {
+                      clearInterval(timerInterval);
+                      alert("Payment session expired! Please try again.");
+                      qrContainer.style.display = "none";
+                  }
+              }, 1000); // Update every second
+          });
+
+          // Cash on Delivery Payment
+          codButton.addEventListener("click", function () {
+              hidePreviousMethod();
+              latestPaymentMethod = codButton;
+
+              alert("Order placed successfully with Cash on Delivery.");
+              window.location.href = "/thank-you";
+          });
+      });
