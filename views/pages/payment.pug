@@ -2,61 +2,14 @@ doctype html
 html(lang="en")
   head
     meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title Payment Options
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css")
     script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js")
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
-    
-    style.
-      body {
-        background-color: #f8f9fa;
-        font-family: 'Poppins', sans-serif;
-      }
-      .container {
-        max-width: 800px;
-        margin-top: 50px;
-      }
-      .card {
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        transition: transform 0.3s;
-      }
-      .card:hover {
-        transform: scale(1.02);
-      }
-      button {
-        font-size: 16px;
-        font-weight: 600;
-        transition: opacity 0.3s;
-      }
-      button:hover {
-        opacity: 0.85;
-      }
-      .modal-header {
-        background-color: #dc3545;
-        color: #fff;
-      }
-      #countdown {
-        font-size: 18px;
-        font-weight: bold;
-        color: #ff5733;
-      }
-      .payment-icons i {
-        font-size: 2rem;
-        margin: 10px;
-        color: #007bff;
-      }
-      .payment-icons img {
-          margin: 10px;
-          transition: transform 0.3s ease-in-out;
-      }
-
-      .payment-icons img:hover {
-          transform: scale(1.1);
-      }
-
+    script(src="https://checkout.razorpay.com/v1/checkout.js") 
+    script(src="/js/payment.js") 
+    link(rel="stylesheet", href="/css/payment.css")
 
   body
     .container.mt-5
@@ -106,123 +59,5 @@ html(lang="en")
                 img(src="https://sc.filehippo.net/images/t_app-icon-l/p/fe0e8ca6-a4f1-11e6-87cf-00163ed833e7/1148601929/paytm-logo", alt="Paytm", width="40")
                 img(src="https://www.uxdt.nic.in/wp-content/uploads/2020/06/BHIM_Preview.png?x76268", alt="BHIM Pay", width="40")
 
-
               img.img-fluid#qr-image(src="/img/qr.jpg", alt="Scan to Pay")
               h4.mt-3#countdown This QR code will expire in: 5:00
-
-    script.
-      document.addEventListener("DOMContentLoaded", function () {
-          const upiButton = document.getElementById("pay-upi");
-          const cardButton = document.getElementById("pay-card");
-          const qrButton = document.getElementById("pay-qr");
-          const codButton = document.getElementById("pay-cod");
-          const upiInput = document.getElementById("upi-id");
-          const verifyButton = document.getElementById("verify-upi");
-          const qrContainer = document.getElementById("qr-container");
-          const countdownDisplay = document.getElementById("countdown");
-
-          let latestPaymentMethod = null; // Track the latest payment method
-
-          function hidePreviousMethod() {
-              if (latestPaymentMethod) {
-                  latestPaymentMethod.style.display = "none";
-              }
-          }
-
-          // Verify UPI ID Before Allowing Payment
-          verifyButton.addEventListener("click", function () {
-              let upiValue = upiInput.value.trim();
-              let upiPattern = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+$/;
-
-              if (!upiPattern.test(upiValue)) {
-                  alert("Invalid UPI ID! Please enter a valid UPI ID.");
-                  upiButton.disabled = true;
-              } else {
-                  alert("UPI ID Verified!");
-                  upiButton.disabled = false;
-              }
-          });
-
-          // UPI Payment Redirect
-          upiButton.addEventListener("click", function () {
-            let upiValue = upiInput.value.trim();
-            if (!upiValue || !upiValue.includes("@")) {
-                alert("Please enter a valid UPI ID.");
-                return;
-            }
-
-            let transactionId = "TXN" + Date.now();
-            let amountElement = document.getElementById("checkoutTotal"); // Ensure this exists in your page
-            let amount = amountElement ? amountElement.innerText.trim() : "0";
-
-            if (!amount || isNaN(parseFloat(amount))) {
-                alert("Invalid amount detected.");
-                return;
-            }
-
-            let upiUrl = `upi://pay?pa=${upiValue}&pn=Your Store&mc=0000&tid=${transactionId}&tr=${transactionId}&tn=Order Payment&am=${amount}&cu=INR`;
-
-            console.log("UPI URL:", upiUrl); // Debugging
-            window.location.href = upiUrl; // Redirect to UPI app
-        });
-
-
-
-          // Razorpay Card Payment
-          cardButton.addEventListener("click", function () {
-              hidePreviousMethod();
-              latestPaymentMethod = cardButton;
-
-              let amount = 1753.00;
-
-              var options = {
-                  key: "YOUR_RAZORPAY_KEY",
-                  amount: amount * 100,
-                  currency: "INR",
-                  name: "Your Store",
-                  description: "Order Payment",
-                  image: "/path-to-your-logo.png",
-                  handler: function (response) {
-                      alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                      window.location.href = "/thank-you";
-                  },
-                  prefill: { name: "Arnav", email: "user@example.com", contact: "07068361837" },
-                  theme: { color: "#3399cc" }
-              };
-
-              var rzp1 = new Razorpay(options);
-              rzp1.open();
-          });
-
-          // QR Code Payment with 5-minute countdown timer
-          qrButton.addEventListener("click", function () {
-            const qrModal = new bootstrap.Modal(document.getElementById("qrModal"));
-            qrModal.show(); // Show the QR modal
-
-            alert("Please scan the QR code to proceed with payment.");
-
-            let timeLeft = 300; // 5 minutes
-
-            const timerInterval = setInterval(function () {
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-                countdownDisplay.innerText = `This QR code will exprie in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                timeLeft--;
-
-                if (timeLeft < 0) {
-                    clearInterval(timerInterval);
-                    alert("Payment session expired! Please try again.");
-                    qrModal.hide(); // Close the modal after timeout
-                }
-            }, 1000); // Update every second
-        });
-
-          // Cash on Delivery Payment
-          codButton.addEventListener("click", function () {
-              hidePreviousMethod();
-              latestPaymentMethod = codButton;
-
-              alert("Order placed successfully with Cash on Delivery.");
-              window.location.href = "/thank-you";
-          });
-      });

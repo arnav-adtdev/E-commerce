@@ -28,9 +28,10 @@ html
 
             // Search Bar (Center)
             .form-container
-              form.d-flex.flex-grow-1.mx-3.position-relative
-                input.form-control(type='search' placeholder='Search for products' aria-label='Search')
-                i.fas.fa-search.position-absolute
+              form#searchForm.d-flex.flex-grow-1.mx-3.position-relative(role="search" onsubmit="return openSearchPage()")
+                  input#searchInput.form-control(type='search' placeholder='Search for products' aria-label='Search')
+                  i.fas.fa-search.position-absolute
+
 
           // Navbar Toggle Button (Visible only on small screens, same size as location)
           button.navbar-toggler(type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav')
@@ -39,19 +40,22 @@ html
         // Navbar content that collapses on small screens
         .collapse.navbar-collapse#navbarNav
             ul.navbar-nav.ms-auto.gap-3
-                li.nav-item.text-center
-                a.nav-link.d-flex.flex-column.align-items-center(href='/cart')
-                    i.fas.fa-shopping-cart.fa-2x
-                    span.mt-1 Cart
-                    
-
-                li.nav-item.text-center
-                a.nav-link.d-flex.flex-column.align-items-center(href='#' data-bs-toggle='modal' data-bs-target='#SignupModal')
-                    i.fas.fa-user-circle.fa-2x
-                    span.mt-1 Account
-
+              li.nav-item.text-center
+                a.nav-link.d-flex.flex-column.align-items-center.icon-hover(href='/cart')
+                  i.fas.fa-shopping-cart.fa-2x
+                  span.mt-1.hidden-text Cart
+              if user 
+                li#profileSection.nav-item.text-center.d-none
+                    a.nav-link.d-flex.flex-column.align-items-center.icon-hover(href='#')
+                        i.fas.fa-user-circle.fa-2x
+                        span.mt-1#userNameNavbar Profile
+              else 
+                li#accountSection.nav-item.text-center
+                      a.nav-link.d-flex.flex-column.align-items-center.icon-hover(href='#' data-bs-toggle='modal' data-bs-target='#SignupModal')
+                          i.fas.fa-user-circle.fa-2x
+                          span.mt-1.hidden-text Account
                 
-
+              
     // Signup Modal
     .modal#SignupModal(tabindex='-1' aria-labelledby='SignupModalLabel' aria-hidden='true')
       .modal-dialog
@@ -127,22 +131,66 @@ html
 
                     div#loginErrorDiv.d-none.alert.alert-danger.mt-3 Role="alert" 
                     | User does not exist. Please sign up first!
-
-
-
-
 script. 
-  function openLoginModal() {
-    // Get references to the modals
-    var signupModal = new bootstrap.Modal(document.getElementById('SignupModal'));
-    var loginModal = new bootstrap.Modal(document.getElementById('LoginModal'));
+  document.addEventListener("DOMContentLoaded", function () {
+      checkLoginState(); // ✅ Ensure user state is checked when the page loads
+  });
 
-    // Hide the Signup Modal
-    signupModal.hide();
-
-    // Wait for the Signup Modal to fully hide before showing the Login Modal
-    setTimeout(() => {
-        loginModal.show();
-    }, 300); // 300ms to match Bootstrap's modal fade-out timing
+  function showUserProfile(name) {
+      localStorage.setItem("loggedInUser", name); // ✅ Store login state
+      setTimeout(() => { location.reload(); }, 500); // ✅ Refresh page after saving data
   }
+
+  function updateNavbar() {
+      let accountSection = document.getElementById("accountSection");
+      let profileSection = document.getElementById("profileSection");
+      let userNameNavbar = document.getElementById("userNameNavbar");
+
+      if (!accountSection || !profileSection || !userNameNavbar) {
+          console.warn("Error: One or more navbar elements are missing from the DOM.");
+          return; // Prevent further errors
+      }
+
+      let loggedInUser = localStorage.getItem("loggedInUser");
+
+      if (loggedInUser) {
+          accountSection.classList.add("d-none"); // ✅ Hide "Account"
+          profileSection.classList.remove("d-none"); // ✅ Show "Profile"
+          userNameNavbar.textContent = loggedInUser; // ✅ Ensure username is displayed
+      } else {
+          accountSection.classList.remove("d-none");
+          profileSection.classList.add("d-none");
+      }
+  }
+
+  function checkLoginState() {
+      let storedUser = localStorage.getItem("loggedInUser");
+      console.log("Stored user:", storedUser); // ✅ Debugging log to check saved user
+      updateNavbar();
+  }
+
+  // Attach event listeners safely after DOM loads
+  document.addEventListener("DOMContentLoaded", function () {
+      let verifyOtpBtn = document.getElementById("verifyOtpBtn");
+      let verifyLoginOtpBtn = document.getElementById("verifyLoginOtpBtn");
+
+      if (verifyOtpBtn) {
+          verifyOtpBtn.addEventListener("click", function () {
+              let firstName = document.getElementById("firstName").value;
+              let lastName = document.getElementById("lastName").value;
+              if (firstName && lastName) {
+                  showUserProfile(firstName + " " + lastName);
+              }
+          });
+      }
+
+      if (verifyLoginOtpBtn) {
+          verifyLoginOtpBtn.addEventListener("click", function () {
+              let loginMobile = document.getElementById("loginMobile").value;
+              if (loginMobile) {
+                  showUserProfile("User " + loginMobile);
+              }
+          });
+      }
+  });
 

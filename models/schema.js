@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true, // Enforces unique emails
+        
         trim: true,
         lowercase: true, // Ensures consistency
         match: [/.+@.+\..+/, 'Please enter a valid email address']

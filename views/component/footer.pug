@@ -1,0 +1,43 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Document
+        link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css") 
+        script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js")
+        style.
+            .text-dark-pink { color: #C71585; } /* Dark pink shade */
+            .delivery-text { font-size: 1.2rem; font-weight: bold; color: #007bff; } /* Blue */
+            .contact-box { background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); } /* Stylish contact section */
+            .contact-icon { font-size: 1.5rem; margin-right: 10px; } /* Icon styling */
+    body
+        .container.mt-4
+            .row
+                .col-md-5.col-5
+                    img(src="/footer/delivery.jpg" alt="img" class="img-fluid rounded shadow-lg" style="background-color: transparent;")
+
+
+                .col-md-7.col-7.text-center.d-md-flex.d-block.flex-column.justify-content-center.align-items-center
+                    p.fs-4.fw-bold.text-dark-pink BEST PRODUCTS IN APNA BAZAAR
+                    p.fs-4.fw-bold.text-primary ON ALL ORDERS
+                    p Delivery Charge ₹40 only
+
+
+        br
+        .container.contact-box.d-flex.flex-column.align-items-center.justify-content-center.p-lg-5
+            p.fw-bold.fs-4.text-dark.text-center.mb-4 Contact Customer Care
+
+            .d-flex.flex-lg-row.flex-column.gap-lg-5.gap-4.align-items-center
+                .d-flex.align-items-center.gap-3
+                    i.fas.fa-envelope.text-dark.contact-icon
+                    a(href="mailto:arnavchaturvedi0@gmail.com" class="text-dark text-decoration-none") arnavchaturvedi0@gmail.com
+                .d-flex.align-items-center.gap-3
+                    i.fas.fa-phone-alt.text-dark.contact-icon
+                    a(href="tel:+919696407839" class="text-dark text-decoration-none") 9696407839 (9:00 AM to 6 PM)
+                .d-flex.align-items-center.gap-3
+                    i.fab.fa-whatsapp.text-success.contact-icon
+                    a(href="https://wa.me/919696407839" target="_blank" class="text-success text-decoration-none") Reach Out to us on WhatsApp
+
+

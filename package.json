@@ -1,5 +1,5 @@
 {
-  "name": "e-com-using-pug",
+  "name": "E-commercer Website",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,7 @@
     "mongoose": "^8.12.2",
     "nodemon": "^3.1.9",
     "pug": "^3.0.3",
+    "razorpay": "^2.9.6",
     "twilio": "^5.5.2"
   }
 }
