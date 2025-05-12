@@ -77,6 +77,7 @@ html(lang="en")
     script.
       document.addEventListener("DOMContentLoaded", function () {
           const cartItemsContainer = document.getElementById("cart-items");
+          const billDetailsSection = document.querySelector(".col-md-4"); // Bill Details Section
           const totalPriceElement = document.getElementById("total-price");
           const totalPriceBill = document.getElementById("total-price-bill");
           const taxesElement = document.getElementById("taxes");
@@ -96,8 +97,10 @@ html(lang="en")
 
               if (cart.length === 0) {
                   cartItemsContainer.innerHTML = `<tr><td colspan="5" class="text-center text-muted fs-5">No items in cart</td></tr>`;
-                  updateBilling(0);
+                  billDetailsSection.style.display = "none"; // 🔹 Hide bill details
                   return;
+              } else {
+                  billDetailsSection.style.display = "block"; // 🔹 Show bill details when cart has items
               }
 
               let total = 0;
@@ -128,7 +131,7 @@ html(lang="en")
               updateBilling(total);
           }
 
-          // ✅ Function to Update Bill Summary
+          // ✅ Function to Handle Billing
           function updateBilling(total) {
               let subtotal = total + deliveryCharge;
               let finalAmount = subtotal;
