@@ -132,65 +132,51 @@ html
                     div#loginErrorDiv.d-none.alert.alert-danger.mt-3 Role="alert" 
                     | User does not exist. Please sign up first!
 script. 
-  document.addEventListener("DOMContentLoaded", function () {
-      checkLoginState(); // ✅ Ensure user state is checked when the page loads
-  });
+    document.addEventListener("DOMContentLoaded", function () {
+        updateNavbar(); // ✅ Ensure navbar updates on page load
+    });
 
-  function showUserProfile(name) {
-      localStorage.setItem("loggedInUser", name); // ✅ Store login state
-      setTimeout(() => { location.reload(); }, 500); // ✅ Refresh page after saving data
-  }
+    // ✅ Save user profile, close modal & update navbar
+    function saveUserProfile(firstName, lastName) {
+        let user = { name: `${firstName} ${lastName}` };
+        localStorage.setItem("loggedInUser", JSON.stringify(user)); // ✅ Save user data
+        updateNavbar(); // ✅ Immediately update navbar
 
-  function updateNavbar() {
-      let accountSection = document.getElementById("accountSection");
-      let profileSection = document.getElementById("profileSection");
-      let userNameNavbar = document.getElementById("userNameNavbar");
+        // 🔹 Close Signup Modal after saving user data
+        let signupModalElement = document.getElementById("SignupModal");
+        let signupModal = bootstrap.Modal.getInstance(signupModalElement);
+        if (signupModal) signupModal.hide(); // ✅ Close modal only if exists
+    }
 
-      if (!accountSection || !profileSection || !userNameNavbar) {
-          console.warn("Error: One or more navbar elements are missing from the DOM.");
-          return; // Prevent further errors
-      }
+    // ✅ Update navbar elements based on login state
+    function updateNavbar() {
+        let accountSection = document.getElementById("accountSection");
+        let profileSection = document.getElementById("profileSection");
+        let userNameNavbar = document.getElementById("userNameNavbar");
 
-      let loggedInUser = localStorage.getItem("loggedInUser");
+        if (!accountSection || !profileSection || !userNameNavbar) {
+            console.warn("Error: Navbar elements are missing.");
+            return; // ✅ Prevent errors if elements aren't found
+        }
 
-      if (loggedInUser) {
-          accountSection.classList.add("d-none"); // ✅ Hide "Account"
-          profileSection.classList.remove("d-none"); // ✅ Show "Profile"
-          userNameNavbar.textContent = loggedInUser; // ✅ Ensure username is displayed
-      } else {
-          accountSection.classList.remove("d-none");
-          profileSection.classList.add("d-none");
-      }
-  }
+        let storedUser = localStorage.getItem("loggedInUser");
+        let userData = storedUser ? JSON.parse(storedUser) : null;
 
-  function checkLoginState() {
-      let storedUser = localStorage.getItem("loggedInUser");
-      console.log("Stored user:", storedUser); // ✅ Debugging log to check saved user
-      updateNavbar();
-  }
+        if (storedUser && storedUser.name) {
+            accountSection.classList.add("d-none"); // ✅ Hide "Account"
+            profileSection.classList.remove("d-none"); // ✅ Show "Profile"
+            userNameNavbar.textContent = storedUser.name; // ✅ Display username
+        } else {
+            accountSection.classList.remove("d-none"); // ✅ Show "Account"
+            profileSection.classList.add("d-none"); // ✅ Hide "Profile"
+        }
+    }
 
-  // Attach event listeners safely after DOM loads
-  document.addEventListener("DOMContentLoaded", function () {
-      let verifyOtpBtn = document.getElementById("verifyOtpBtn");
-      let verifyLoginOtpBtn = document.getElementById("verifyLoginOtpBtn");
-
-      if (verifyOtpBtn) {
-          verifyOtpBtn.addEventListener("click", function () {
-              let firstName = document.getElementById("firstName").value;
-              let lastName = document.getElementById("lastName").value;
-              if (firstName && lastName) {
-                  showUserProfile(firstName + " " + lastName);
-              }
-          });
-      }
-
-      if (verifyLoginOtpBtn) {
-          verifyLoginOtpBtn.addEventListener("click", function () {
-              let loginMobile = document.getElementById("loginMobile").value;
-              if (loginMobile) {
-                  showUserProfile("User " + loginMobile);
-              }
-          });
-      }
-  });
-
+    // ✅ Handle user signup & login events
+    document.getElementById("verifyOtpBtn")?.addEventListener("click", function () {
+        let firstName = document.getElementById("firstName").value.trim();
+        let lastName = document.getElementById("lastName").value.trim();
+        if (firstName && lastName) {
+            saveUserProfile(firstName, lastName);
+        }
+    });

@@ -12,6 +12,19 @@ html(lang="en")
             .delivery-text { font-size: 1.2rem; font-weight: bold; color: #007bff; } /* Blue */
             .contact-box { background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); } /* Stylish contact section */
             .contact-icon { font-size: 1.5rem; margin-right: 10px; } /* Icon styling */
+
+            @media (max-width: 768px) {
+                .row {
+                    display: flex;
+                    align-items: stretch; 
+                }
+                .col-md-5, .col-md-7 {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                }
+            }
+
     body
         .container.mt-4
             .row
