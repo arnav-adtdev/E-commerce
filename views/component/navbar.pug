@@ -13,48 +13,53 @@ html
     script(src="js/navbar.js") 
 
   body
+nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 211); padding: 8px;")
     .container-fluid
-      nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 211); padding: 8px;")
+        .navbar-top-row.d-flex.justify-content-between.align-items-center.w-100
+            // Logo
+            a.navbar-brand.d-none.d-lg-block(href="#")
+                img(src="/navlogo/Apna.png" alt="Logo" width="90" height="30" style="margin-left:6rem")
 
-        .d-flex.w-100.justify-content-between.align-items-center
-          a.navbar-brand.d-none.d-lg-block(href='#')
-            img(src='/navlogo/Apna.png' alt='Logo' width='90' height='30' style="margin-left:6rem")
+            // Location & Toggle Button in Same Row
+            .d-flex.align-items-center.justify-content-between.w-100
+                .location-container.d-flex.align-items-center
+                    i.fas.fa-map-marker-alt.me-2
+                    span#location.navbar-text Loading location...
+                
+                button.navbar-toggler(type="button" data-bs-toggle="offcanvas" data-bs-target="#sideNavbar" aria-controls="sideNavbar")
+                    span.navbar-toggler-icon
 
-          .d-flex.align-items-center.gap-5
-            // Location text
-            span.d-flex.align-items-center
-              i.fas.fa-map-marker-alt.me-2
-              span#location.navbar-text Loading location...
+        // Search Bar - Full Width on Mobile
+        .search-container.mt-3.w-100
+            form#searchForm.d-flex.mx-3.position-relative(role="search" onsubmit="return openSearchPage()")
+                input#searchInput.form-control(type="search" placeholder="Search for products")
+                i.fas.fa-search.position-absolute
 
-            // Search Bar (Center)
-            .form-container
-              form#searchForm.d-flex.flex-grow-1.mx-3.position-relative(role="search" onsubmit="return openSearchPage()")
-                  input#searchInput.form-control(type='search' placeholder='Search for products' aria-label='Search')
-                  i.fas.fa-search.position-absolute
+    // Offcanvas Sidebar Menu (Opens from Left)
+    div.offcanvas.offcanvas-start#sideNavbar(tabindex="-1" aria-labelledby="sideNavbarLabel")
+        div.offcanvas-header
+            h5#sideNavbarLabel 
+            button.btn-close(type="button" data-bs-dismiss="offcanvas" aria-label="Close")
 
-
-          // Navbar Toggle Button (Visible only on small screens, same size as location)
-          button.navbar-toggler(type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav')
-            span.navbar-toggler-icon
-
-        // Navbar content that collapses on small screens
-        .collapse.navbar-collapse#navbarNav
+        div.offcanvas-body
             ul.navbar-nav.ms-auto.gap-3
-              li.nav-item.text-center
-                a.nav-link.d-flex.flex-column.align-items-center.icon-hover(href='/cart')
-                  i.fas.fa-shopping-cart.fa-2x
-                  span.mt-1.hidden-text Cart
-              if user 
+                // Cart
+                li.nav-item.text-center
+                    a.nav-link.d-flex.flex-column.align-items-center(href="/cart")
+                        i.fas.fa-shopping-cart.fa-2x
+                        span.mt-1 Cart
+                
+                // Profile & Account Sections
+                li#accountSection.nav-item.text-center
+                    a.nav-link.d-flex.flex-column.align-items-center(href="#" data-bs-toggle="modal" data-bs-target="#SignupModal")
+                        i.fas.fa-user-circle.fa-2x
+                        span.mt-1 Account
+                
                 li#profileSection.nav-item.text-center.d-none
-                    a.nav-link.d-flex.flex-column.align-items-center.icon-hover(href='#')
+                    a.nav-link.d-flex.flex-column.align-items-center(href="#")
                         i.fas.fa-user-circle.fa-2x
                         span.mt-1#userNameNavbar Profile
-              else 
-                li#accountSection.nav-item.text-center
-                      a.nav-link.d-flex.flex-column.align-items-center.icon-hover(href='#' data-bs-toggle='modal' data-bs-target='#SignupModal')
-                          i.fas.fa-user-circle.fa-2x
-                          span.mt-1.hidden-text Account
-                
+
               
     // Signup Modal
     .modal#SignupModal(tabindex='-1' aria-labelledby='SignupModalLabel' aria-hidden='true')

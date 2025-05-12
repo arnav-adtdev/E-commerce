@@ -1,70 +1,148 @@
-/* General Styling */
-.form-container {
+/* General Navbar Styling */
+.navbar {
+    background-color: rgb(28, 166, 211);
+    padding: 12px 15px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* Navbar Logo */
+.navbar-brand img {
+    width: 90px;
+    height: 30px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.15);
+}
+
+/* Navbar Top Row */
+.navbar-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
 }
 
+/* Location Styling */
+#location {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    
+}
+
+#location i {
+    margin-right: 8px;
+    font-size: 1.3rem;
+   
+    transition: color 0.3s ease-in-out;
+}
+
+
+/* Navbar Toggle Button */
 .navbar-toggler {
-    padding: 0;
+    padding: 8px;
     border: none;
     background: none;
-    font-size: 1.5rem;
-    color: #000;
+    font-size: 1.8rem;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
+ 
 }
 
-.navbar-toggler-icon {
-    background-color: transparent;
-    margin-bottom: 5rem;
-}
 
-/* Navbar Search Bar */
-.form-control {
-    padding-left: 2.5rem; 
-    font-size: 1rem;
-    max-width: 20rem;
+/* Improved Search Icon Visibility */
+.search-container {
+    position: relative;
     width: 100%;
-    box-sizing: border-box;
+    max-width: 450px;
 }
 
-.fas.fa-search {
+/* Elegant Search Input Field */
+.search-container input {
+    padding: 12px 15px 12px 45px; /* Adjusted padding for better spacing */
+    width: 100%;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Focused Search Input Style */
+.search-container input:focus {
+    border-color: rgb(28, 166, 211);
+    outline: none;
+    box-shadow: 0 4px 10px rgba(28, 166, 211, 0.3);
+}
+
+/* Search Icon Enhancement */
+.search-container i.fas.fa-search {
     position: absolute;
     top: 50%;
-    left: 10px;
+    left: 12px;
     transform: translateY(-50%);
-    color: #999;
+    color: #555;
+    font-size: 1.5rem;
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+    opacity: 0.8;
+}
+
+
+/* Offcanvas Sidebar (Open from Left) */
+.offcanvas-start {
+    width: 280px;
+    background-color: rgb(28, 166, 211);
+   
+    transition: all 0.3s ease-in-out;
+}
+
+/* Offcanvas Header */
+.offcanvas-header {
+    background-color: rgb(20, 140, 180);
+    padding: 14px;
     font-size: 1.2rem;
+    font-weight: bold;
 }
 
-.icon-hover {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
+/* Navbar Items Inside Offcanvas */
+.offcanvas-body ul.navbar-nav {
+    padding: 15px;
 }
 
-/* Hide text initially */
-.hidden-text {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+.offcanvas-body a.nav-link {
+    
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-/* Show text on hover */
-.icon-hover:hover .hidden-text {
-    opacity: 1;
-    visibility: visible;
+.offcanvas-body a.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    transform: scale(1.05);
 }
 
+/* Custom Close Button */
+.offcanvas .btn-close {
+    background-color: white;
+    opacity: 0.8;
+}
 
-/* Mobile Responsiveness */
+/* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
-    .form-container {
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
+    .navbar-top-row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .search-container {
+        max-width: 100%;
+        margin-top: 10px;
     }
 
     #location {
@@ -72,13 +150,17 @@
     }
 }
 
-@media (max-width: 767px) {
-    .gap-5 {
-        flex-direction: column;
-        align-items: flex-start;
+@media (max-width: 576px) {
+    .navbar-top-row {
+        flex-direction: row;
     }
 
-    #location {
-        font-size: 0.9rem;
+    .search-container {
+        max-width: 100%;
+        margin-top: 10px;
+    }
+
+    .navbar-toggler {
+        font-size: 1.5rem;
     }
 }
