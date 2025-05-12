@@ -56,9 +56,46 @@ nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 21
                         span.mt-1 Account
                 
                 li#profileSection.nav-item.text-center.d-none
-                    a.nav-link.d-flex.flex-column.align-items-center(href="#")
+                    a.nav-link.d-flex.flex-column.align-items-center(href="#" data-bs-toggle="modal" data-bs-target="#ProfileModal")
                         i.fas.fa-user-circle.fa-2x
                         span.mt-1#userNameNavbar Profile
+
+    //profilemodal
+    .modal#ProfileModal(tabindex="-1" aria-labelledby="ProfileModalLabel" aria-hidden="true")
+        .modal-dialog.modal-dialog-centered.modal-lg
+            .modal-content
+                .modal-header.bg-primary.text-white
+                    h5#ProfileModalLabel.modal-title User Profile
+                    button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+
+                .modal-body
+                    // User Info Section
+                    .text-center
+                        i.fas.fa-user-circle.fa-4x.text-white.bg-primary.rounded-circle.p-3.mb-3
+                        h4#userNameProfile User Name
+                        p#userEmailProfile.text-muted user@example.com
+
+                    hr
+
+                    // Profile Options
+                    .list-group.list-group-flush
+                        a.list-group-item.list-group-item-action.d-flex.align-items-center(href="#")
+                            i.fas.fa-cog.me-2.text-primary
+                            span Settings
+                        a.list-group-item.list-group-item-action.d-flex.align-items-center(href="#" onclick="handleLogout()")
+                            i.fas.fa-sign-out-alt.me-2.text-danger
+                            span Logout
+                        a.list-group-item.list-group-item-action.d-flex.align-items-center(href="#")
+                            i.fas.fa-history.me-2.text-success
+                            span Order History
+                        a.list-group-item.list-group-item-action.d-flex.align-items-center(href="/footer")
+                            i.fas.fa-question-circle.me-2.text-warning
+                            span Help & Support
+
+                .modal-footer.justify-content-between
+                    button.btn.btn-outline-secondary(type="button" data-bs-dismiss="modal") Close
+                    button.btn.btn-primary(type="button" onclick="handleSettings()") Manage Account
+
 
               
     // Signup Modal
@@ -137,51 +174,96 @@ nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 21
                     div#loginErrorDiv.d-none.alert.alert-danger.mt-3 Role="alert" 
                     | User does not exist. Please sign up first!
 script. 
-    document.addEventListener("DOMContentLoaded", function () {
-        updateNavbar(); // ✅ Ensure navbar updates on page load
-    });
+  document.addEventListener("DOMContentLoaded", function () {
+      updateNavbar(); // ✅ Ensure navbar updates on page load
+      console.log("✅ Navbar loaded successfully!");
+  });
 
-    // ✅ Save user profile, close modal & update navbar
-    function saveUserProfile(firstName, lastName) {
-        let user = { name: `${firstName} ${lastName}` };
-        localStorage.setItem("loggedInUser", JSON.stringify(user)); // ✅ Save user data
-        updateNavbar(); // ✅ Immediately update navbar
+  // ✅ Function to Save User Profile, Close Modal & Update Navbar
+  function saveUserProfile(firstName, lastName, email = "") {
+      let user = { name: `${firstName} ${lastName}`, email };
+      localStorage.setItem("loggedInUser", JSON.stringify(user));
+      updateNavbar(); // Refresh Navbar UI
 
-        // 🔹 Close Signup Modal after saving user data
-        let signupModalElement = document.getElementById("SignupModal");
-        let signupModal = bootstrap.Modal.getInstance(signupModalElement);
-        if (signupModal) signupModal.hide(); // ✅ Close modal only if exists
-    }
+      // 🔹 Close Signup Modal
+      let signupModalElement = document.getElementById("SignupModal");
+      let signupModal = bootstrap.Modal.getInstance(signupModalElement);
+      if (signupModal) signupModal.hide();
+  }
 
-    // ✅ Update navbar elements based on login state
-    function updateNavbar() {
-        let accountSection = document.getElementById("accountSection");
-        let profileSection = document.getElementById("profileSection");
-        let userNameNavbar = document.getElementById("userNameNavbar");
+  // ✅ Function to Update Profile Modal Data
+  function updateProfileModal() {
+      let storedUser = localStorage.getItem("loggedInUser");
+      let userData = storedUser ? JSON.parse(storedUser) : null;
 
-        if (!accountSection || !profileSection || !userNameNavbar) {
-            console.warn("Error: Navbar elements are missing.");
-            return; // ✅ Prevent errors if elements aren't found
-        }
+      if (userData && userData.name) {
+          document.getElementById("userNameProfile").textContent = userData.name;
+          document.getElementById("userNameNavbar").textContent = userData.name;
+          document.getElementById("userEmailProfile").textContent = userData.email || "Not Provided";
+      }
+  }
 
-        let storedUser = localStorage.getItem("loggedInUser");
-        let userData = storedUser ? JSON.parse(storedUser) : null;
+  // ✅ Function to Handle Logout
+  function handleLogout() {
+      localStorage.removeItem("loggedInUser"); // Clear user data
+      updateNavbar(); // Refresh Navbar UI
+      alert("✅ Successfully logged out!");
+  }
 
-        if (storedUser && storedUser.name) {
-            accountSection.classList.add("d-none"); // ✅ Hide "Account"
-            profileSection.classList.remove("d-none"); // ✅ Show "Profile"
-            userNameNavbar.textContent = storedUser.name; // ✅ Display username
-        } else {
-            accountSection.classList.remove("d-none"); // ✅ Show "Account"
-            profileSection.classList.add("d-none"); // ✅ Hide "Profile"
-        }
-    }
+  // ✅ Function to Update Navbar Elements Based on Login State
+  function updateNavbar() {
+      let accountSection = document.getElementById("accountSection");
+      let profileSection = document.getElementById("profileSection");
+      let userNameNavbar = document.getElementById("userNameNavbar");
 
-    // ✅ Handle user signup & login events
-    document.getElementById("verifyOtpBtn")?.addEventListener("click", function () {
-        let firstName = document.getElementById("firstName").value.trim();
-        let lastName = document.getElementById("lastName").value.trim();
-        if (firstName && lastName) {
-            saveUserProfile(firstName, lastName);
-        }
-    });
+      if (!accountSection || !profileSection || !userNameNavbar) {
+          console.warn("⚠️ Error: Navbar elements are missing.");
+          return;
+      }
+
+      let storedUser = localStorage.getItem("loggedInUser");
+      let userData = storedUser ? JSON.parse(storedUser) : null;
+
+      if (userData && userData.name) {
+          accountSection.classList.add("d-none"); // Hide "Account"
+          profileSection.classList.remove("d-none"); // Show "Profile"
+          userNameNavbar.textContent = userData.name; // Update username
+          updateProfileModal(); // ✅ Update Profile Modal Data
+      } else {
+          accountSection.classList.remove("d-none"); // Show "Account"
+          profileSection.classList.add("d-none"); // Hide "Profile"
+      }
+  }
+
+  // ✅ Function to Handle Navbar Toggle Functionality for Large Screens
+  document.addEventListener("DOMContentLoaded", function () {
+      const navbarToggler = document.querySelector(".navbar-toggler");
+      const sideNavbar = document.getElementById("sideNavbar");
+
+      if (navbarToggler && sideNavbar) {
+          navbarToggler.addEventListener("click", () => {
+              if (window.innerWidth >= 992) {
+                  sideNavbar.classList.toggle("show");
+              }
+          });
+      }
+  });
+
+  // ✅ Function to Close Offcanvas Properly When Clicking Outside
+  document.addEventListener("click", function (event) {
+      const sideNavbar = document.getElementById("sideNavbar");
+      if (sideNavbar.classList.contains("show") && !sideNavbar.contains(event.target)) {
+          sideNavbar.classList.remove("show");
+      }
+  });
+
+  // ✅ Event Listener for User Signup
+  document.getElementById("verifyOtpBtn")?.addEventListener("click", function () {
+      let firstName = document.getElementById("firstName").value.trim();
+      let lastName = document.getElementById("lastName").value.trim();
+      let email = document.getElementById("email").value.trim();
+      
+      if (firstName && lastName) {
+          saveUserProfile(firstName, lastName, email);
+      }
+  });

@@ -120,17 +120,6 @@
     transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-.offcanvas-body a.nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    transform: scale(1.05);
-}
-
-/* Custom Close Button */
-.offcanvas .btn-close {
-    background-color: white;
-    opacity: 0.8;
-}
 
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {

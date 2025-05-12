@@ -60,6 +60,11 @@ app.get("/men", (req, res) => {
   res.render("pages/men");
 });
 
+//component page render
+app.get("/footer", (req, res) => {
+  res.render("component/footer");
+});
+
 // Send OTP Endpoint
 app.post('/send-otp', async (req, res) => {
   const { phoneNumber } = req.body;
