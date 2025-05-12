@@ -55,21 +55,32 @@ body {
     font-size: 0.9rem;
 }
 
-/* Price & Discount */
-.text-primary {
-    font-size: 1.2rem;
+/* Price & Discount Styling */
+.card-text {
+    font-size: 1rem; /* Decrease size */
     font-weight: bold;
+    color: #007bff; /* Maintain primary color */
 }
 
-/* Add to Cart Button */
+/* Additional Adjustments */
+.card-text.text-primary.fw-bold {
+    font-size: 0.9rem; /* Slightly smaller */
+}
+
+
+/* Default Button Size */
 .add-to-cart {
-    font-size: 0.9rem;
-    padding: 10px 12px;
+    font-size: 1rem; /* Standard size */
+    padding: 10px 14px;
     font-weight: 600;
     border-radius: 8px;
     transition: background-color 0.3s ease-in-out;
 }
 
-.add-to-cart:hover {
-    background-color: #007bff;
+/* Minimized Button for Mobile View */
+@media (max-width: 576px) {
+    .add-to-cart {
+        font-size: 0.5rem; /* Smaller font */
+        padding: 6px 10px; /* Smaller padding */
+    }
 }
