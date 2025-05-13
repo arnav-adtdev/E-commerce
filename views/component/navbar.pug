@@ -184,187 +184,186 @@ nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 21
 
 script. 
 
-  //login modal js 
-  async function checkUserExists() {
-      let mobileNumber = document.getElementById("loginMobile").value;
-      
-      if (!mobileNumber.match(/^[0-9]{10}$/)) {
-          alert("Please enter a valid 10-digit mobile number.");
-          return;
-      }
+    //login modal js 
+    async function checkUserExists() {
+        let mobileNumber = document.getElementById("loginMobile").value;
+        
+        if (!mobileNumber.match(/^[0-9]{10}$/)) {
+            alert("Please enter a valid 10-digit mobile number.");
+            return;
+        }
 
-      try {
-          let response = await fetch(`/api/checkUser?mobile=${mobileNumber}`);
-          let data = await response.json();
+        try {
+            let response = await fetch(`/api/checkUser?mobile=${mobileNumber}`);
+            let data = await response.json();
 
-          if (data.exists) {
-              sendOtp(mobileNumber);
-          } else {
-              document.getElementById("loginErrorDiv").classList.remove("d-none");
-              document.getElementById("loginErrorDiv").innerText = "User does not exist. Please sign up first!";
-          }
-      } catch (error) {
-          console.error("Error checking user:", error);
-          alert("Something went wrong. Please try again later.");
-      }
-  }
+            if (data.exists) {
+                sendOtp(mobileNumber);
+            } else {
+                document.getElementById("loginErrorDiv").classList.remove("d-none");
+                document.getElementById("loginErrorDiv").innerText = "User does not exist. Please sign up first!";
+            }
+        } catch (error) {
+            console.error("Error checking user:", error);
+            alert("Something went wrong. Please try again later.");
+        }
+    }
 
-  async function sendOtp(mobileNumber) {
-      try {
-          console.log(`Sending OTP to: ${mobileNumber}`);
+    async function sendOtp(mobileNumber) {
+        try {
+            console.log(`Sending OTP to: ${mobileNumber}`);
 
-          let response = await fetch(`/api/sendOtp?mobile=${mobileNumber}`);
-          
-          if (!response.ok) {
-              throw new Error(`HTTP Error! Status: ${response.status}`);
-          }
+            let response = await fetch(`/api/sendOtp?mobile=${mobileNumber}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP Error! Status: ${response.status}`);
+            }
 
-          let data = await response.json();
-          console.log("API Response:", data);
+            let data = await response.json();
+            console.log("API Response:", data);
 
-          if (data.success) {
-              document.getElementById("loginOtpSection").classList.remove("d-none");
-          } else {
-              alert("Failed to send OTP. Please try again.");
-          }
-      } catch (error) {
-          console.error("Error sending OTP:", error);
-          alert(`Something went wrong: ${error.message}`);
-      }
-  }
+            if (data.success) {
+                document.getElementById("loginOtpSection").classList.remove("d-none");
+            } else {
+                alert("Failed to send OTP. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error sending OTP:", error);
+            alert(`Something went wrong: ${error.message}`);
+        }
+    }
 
 
 script. 
 
-  // function to change modal
+    // function to change modal
+    function switchModal(currentModalId, targetModalId) {
+        const currentModalEl = document.getElementById(currentModalId);
+        const targetModalEl = document.getElementById(targetModalId);
 
-  function switchModal(currentModalId, targetModalId) {
-      const currentModalEl = document.getElementById(currentModalId);
-      const targetModalEl = document.getElementById(targetModalId);
+        // ✅ Ensure current modal exists before trying to hide it
+        if (currentModalEl) {
+            const currentModalInstance = bootstrap.Modal.getInstance(currentModalEl);
+            if (currentModalInstance) {
+                currentModalInstance.hide();
+            }
+        } else {
+            console.warn(`Modal with ID '${currentModalId}' does not exist.`);
+        }
 
-      // ✅ Ensure current modal exists before trying to hide it
-      if (currentModalEl) {
-          const currentModalInstance = bootstrap.Modal.getInstance(currentModalEl);
-          if (currentModalInstance) {
-              currentModalInstance.hide();
-          }
-      } else {
-          console.warn(`Modal with ID '${currentModalId}' does not exist.`);
-      }
+        // ✅ Ensure target modal exists before showing
+        setTimeout(() => {
+            if (targetModalEl) {
+                const targetModalInstance = new bootstrap.Modal(targetModalEl);
+                targetModalInstance.show();
+            } else {
+                console.error(`Modal with ID '${targetModalId}' does not exist.`);
+            }
+        }, 300); // Delay ensures smooth transition
+    }
 
-      // ✅ Ensure target modal exists before showing
-      setTimeout(() => {
-          if (targetModalEl) {
-              const targetModalInstance = new bootstrap.Modal(targetModalEl);
-              targetModalInstance.show();
-          } else {
-              console.error(`Modal with ID '${targetModalId}' does not exist.`);
-          }
-      }, 300); // Delay ensures smooth transition
-  }
+    // ✅ Open Login Modal from Signup Modal
+    function openLoginModal() {
+        switchModal("SignupModal", "LoginModal");
+    }
 
-  // ✅ Open Login Modal from Signup Modal
-  function openLoginModal() {
-      switchModal("SignupModal", "LoginModal");
-  }
+    // ✅ Open Signup Modal from Login Modal
+    function openSignupModal() {
+        switchModal("LoginModal", "SignupModal");
+    }
 
-  // ✅ Open Signup Modal from Login Modal
-  function openSignupModal() {
-      switchModal("LoginModal", "SignupModal");
-  }
+    // automatically reload 
+    document.addEventListener("DOMContentLoaded", function () {
+        updateNavbar(); // ✅ Ensure navbar updates on page load
+        console.log("✅ Navbar loaded successfully!");
+    });
 
-  // automatically reload 
-  document.addEventListener("DOMContentLoaded", function () {
-      updateNavbar(); // ✅ Ensure navbar updates on page load
-      console.log("✅ Navbar loaded successfully!");
-  });
+    // ✅ Function to Save User Profile, Close Modal & Update Navbar
+    function saveUserProfile(firstName, lastName, email = "") {
+        let user = { name: `${firstName} ${lastName}`, email };
+        localStorage.setItem("loggedInUser", JSON.stringify(user));
+        updateNavbar(); // Refresh Navbar UI
 
-  // ✅ Function to Save User Profile, Close Modal & Update Navbar
-  function saveUserProfile(firstName, lastName, email = "") {
-      let user = { name: `${firstName} ${lastName}`, email };
-      localStorage.setItem("loggedInUser", JSON.stringify(user));
-      updateNavbar(); // Refresh Navbar UI
+        // 🔹 Close Signup Modal
+        let signupModalElement = document.getElementById("SignupModal");
+        let signupModal = bootstrap.Modal.getInstance(signupModalElement);
+        if (signupModal) signupModal.hide();
+    }
 
-      // 🔹 Close Signup Modal
-      let signupModalElement = document.getElementById("SignupModal");
-      let signupModal = bootstrap.Modal.getInstance(signupModalElement);
-      if (signupModal) signupModal.hide();
-  }
+    // ✅ Function to Update Profile Modal Data
+    function updateProfileModal() {
+        let storedUser = localStorage.getItem("loggedInUser");
+        let userData = storedUser ? JSON.parse(storedUser) : null;
 
-  // ✅ Function to Update Profile Modal Data
-  function updateProfileModal() {
-      let storedUser = localStorage.getItem("loggedInUser");
-      let userData = storedUser ? JSON.parse(storedUser) : null;
+        if (userData && userData.name) {
+            document.getElementById("userNameProfile").textContent = userData.name;
+            document.getElementById("userNameNavbar").textContent = userData.name;
+            document.getElementById("userEmailProfile").textContent = userData.email || "Not Provided";
+        }
+    }
 
-      if (userData && userData.name) {
-          document.getElementById("userNameProfile").textContent = userData.name;
-          document.getElementById("userNameNavbar").textContent = userData.name;
-          document.getElementById("userEmailProfile").textContent = userData.email || "Not Provided";
-      }
-  }
+    // ✅ Function to Handle Logout
+    function handleLogout() {
+        localStorage.removeItem("loggedInUser"); // Clear user data
+        updateNavbar(); // Refresh Navbar UI
+        alert("✅ Successfully logged out!");
+    }
 
-  // ✅ Function to Handle Logout
-  function handleLogout() {
-      localStorage.removeItem("loggedInUser"); // Clear user data
-      updateNavbar(); // Refresh Navbar UI
-      alert("✅ Successfully logged out!");
-  }
+    // ✅ Function to Update Navbar Elements Based on Login State
+    function updateNavbar() {
+        let accountSection = document.getElementById("accountSection");
+        let profileSection = document.getElementById("profileSection");
+        let userNameNavbar = document.getElementById("userNameNavbar");
 
-  // ✅ Function to Update Navbar Elements Based on Login State
-  function updateNavbar() {
-      let accountSection = document.getElementById("accountSection");
-      let profileSection = document.getElementById("profileSection");
-      let userNameNavbar = document.getElementById("userNameNavbar");
+        if (!accountSection || !profileSection || !userNameNavbar) {
+            console.warn("⚠️ Error: Navbar elements are missing.");
+            return;
+        }
 
-      if (!accountSection || !profileSection || !userNameNavbar) {
-          console.warn("⚠️ Error: Navbar elements are missing.");
-          return;
-      }
+        let storedUser = localStorage.getItem("loggedInUser");
+        let userData = storedUser ? JSON.parse(storedUser) : null;
 
-      let storedUser = localStorage.getItem("loggedInUser");
-      let userData = storedUser ? JSON.parse(storedUser) : null;
+        if (userData && userData.name) {
+            accountSection.classList.add("d-none"); // Hide "Account"
+            profileSection.classList.remove("d-none"); // Show "Profile"
+            userNameNavbar.textContent = userData.name; // Update username
+            updateProfileModal(); // ✅ Update Profile Modal Data
+        } else {
+            accountSection.classList.remove("d-none"); // Show "Account"
+            profileSection.classList.add("d-none"); // Hide "Profile"
+        }
+    }
 
-      if (userData && userData.name) {
-          accountSection.classList.add("d-none"); // Hide "Account"
-          profileSection.classList.remove("d-none"); // Show "Profile"
-          userNameNavbar.textContent = userData.name; // Update username
-          updateProfileModal(); // ✅ Update Profile Modal Data
-      } else {
-          accountSection.classList.remove("d-none"); // Show "Account"
-          profileSection.classList.add("d-none"); // Hide "Profile"
-      }
-  }
+    // ✅ Function to Handle Navbar Toggle Functionality for Large Screens
+    document.addEventListener("DOMContentLoaded", function () {
+        const navbarToggler = document.querySelector(".navbar-toggler");
+        const sideNavbar = document.getElementById("sideNavbar");
 
-  // ✅ Function to Handle Navbar Toggle Functionality for Large Screens
-  document.addEventListener("DOMContentLoaded", function () {
-      const navbarToggler = document.querySelector(".navbar-toggler");
-      const sideNavbar = document.getElementById("sideNavbar");
+        if (navbarToggler && sideNavbar) {
+            navbarToggler.addEventListener("click", () => {
+                if (window.innerWidth >= 992) {
+                    sideNavbar.classList.toggle("show");
+                }
+            });
+        }
+    });
 
-      if (navbarToggler && sideNavbar) {
-          navbarToggler.addEventListener("click", () => {
-              if (window.innerWidth >= 992) {
-                  sideNavbar.classList.toggle("show");
-              }
-          });
-      }
-  });
+    // ✅ Function to Close Offcanvas Properly When Clicking Outside
+    document.addEventListener("click", function (event) {
+        const sideNavbar = document.getElementById("sideNavbar");
+        if (sideNavbar.classList.contains("show") && !sideNavbar.contains(event.target)) {
+            sideNavbar.classList.remove("show");
+        }
+    });
 
-  // ✅ Function to Close Offcanvas Properly When Clicking Outside
-  document.addEventListener("click", function (event) {
-      const sideNavbar = document.getElementById("sideNavbar");
-      if (sideNavbar.classList.contains("show") && !sideNavbar.contains(event.target)) {
-          sideNavbar.classList.remove("show");
-      }
-  });
-
-  // ✅ Event Listener for User Signup
-  document.getElementById("verifyOtpBtn")?.addEventListener("click", function () {
-      let firstName = document.getElementById("firstName").value.trim();
-      let lastName = document.getElementById("lastName").value.trim();
-      let email = document.getElementById("email").value.trim();
-      
-      if (firstName && lastName) {
-          saveUserProfile(firstName, lastName, email);
-      }
-  });
+    // ✅ Event Listener for User Signup
+    document.getElementById("verifyOtpBtn")?.addEventListener("click", function () {
+        let firstName = document.getElementById("firstName").value.trim();
+        let lastName = document.getElementById("lastName").value.trim();
+        let email = document.getElementById("email").value.trim();
+        
+        if (firstName && lastName) {
+            saveUserProfile(firstName, lastName, email);
+        }
+    });
 
