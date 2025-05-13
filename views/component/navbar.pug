@@ -84,7 +84,7 @@ nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 21
                             i.fas.fa-cog.me-2.text-primary
                             span Settings
                        
-                        a.list-group-item.list-group-item-action.d-flex.align-items-center(href="#")
+                        a.list-group-item.list-group-item-action.d-flex.align-items-center(href="/getOrders")
                             i.fas.fa-history.me-2.text-success
                             span My Order
                         a.list-group-item.list-group-item-action.d-flex.align-items-center(href="/footer")
@@ -101,7 +101,8 @@ nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 21
 
               
     // Signup Modal
-    .modal#SignupModal(tabindex='-1' aria-labelledby='SignupModalLabel' aria-hidden='true')
+    .modal#SignupModal(tabindex="-1" aria-labelledby="SignupModalLabel" aria-hidden="true")
+
       .modal-dialog
         .modal-content
           .modal-header
@@ -135,6 +136,7 @@ nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 21
               div#registeredDivUpper.d-flex.justify-content-between.align-items-center.mt-3
                 p.text-muted.mb-0 If user already registered?
                 button.btn.btn-primary(type="button" onclick="openLoginModal()") Login
+
               button#resendOtpBtn.btn.btn-link.d-none Resend OTP
 
               .mb-3.mt-3.d-none#otpSection
@@ -147,35 +149,131 @@ nav.navbar.navbar-expand-lg.navbar-light(style="background-color:rgb(28, 166, 21
               div#registeredDivLower.d-none.d-flex.justify-content-between.align-items-center.mt-3
                 p.text-muted.mb-0 If user already registered?
                 button.btn.btn-primary(type="button" onclick="openLoginModal()") Login
+
           
 
-          // Login Modal
-          .modal#LoginModal(tabindex='-1' aria-labelledby='LoginModalLabel' aria-hidden='true')
-            .modal-dialog
-              .modal-content
-                .modal-header
-                  h5#LoginModalLabel.modal-title Login with OTP
-                  button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+    // Login Modal
+    .modal#LoginModal(tabindex="-1" aria-labelledby="LoginModalLabel" aria-hidden="true")
 
-                .modal-body
-                  form#LoginForm
-                    .mb-3
-                      label.form-label(for='loginMobile') Mobile Number
-                      span.text-danger.ms-2 *
-                      input#loginMobile.form-control(type='tel' placeholder='Enter Mobile Number' required pattern="[0-9]{10}" maxlength="10")
+      .modal-dialog
+        .modal-content
+          .modal-header
+            h5#LoginModalLabel.modal-title Login with OTP
+            button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
 
-                    button#sendLoginOtpBtn.btn.btn-secondary.w-100(type='button' onclick="checkUserExists()") Send OTP
+          .modal-body
+            form#LoginForm
+              .mb-3
+                label.form-label(for='loginMobile') Mobile Number
+                span.text-danger.ms-2 *
+                input#loginMobile.form-control(type='tel' placeholder='Enter Mobile Number' required pattern="[0-9]{10}" maxlength="10")
 
-                    .mb-3.mt-3.d-none#loginOtpSection
-                      label.form-label(for='loginOtp') Enter OTP
-                      span.text-danger.ms-2 *
-                      input#loginOtp.form-control(type='text' placeholder='Enter OTP' required maxlength="6")
+              button#sendLoginOtpBtn.btn.btn-secondary.w-100(type='button' onclick="checkUserExists()") Send OTP
 
-                    button#verifyLoginOtpBtn.btn.btn-primary.w-100.mt-3.d-none(type='button') Verify & Login
+              .mb-3.mt-3.d-none#loginOtpSection
+                label.form-label(for='loginOtp') Enter OTP
+                span.text-danger.ms-2 *
+                input#loginOtp.form-control(type='text' placeholder='Enter OTP' required maxlength="6")
 
-                    div#loginErrorDiv.d-none.alert.alert-danger.mt-3 Role="alert" 
-                    | User does not exist. Please sign up first!
+              button#verifyLoginOtpBtn.btn.btn-primary.w-100.mt-3.d-none(type='button') Verify & Login
+
+              div#loginErrorDiv.d-none.alert.alert-danger.mt-3 Role="alert" 
+              | User does not exist. Please sign up first!
+              
+              button.btn.btn-primary(type="button" onclick="openSignupModal()") Register
+
 script. 
+
+  //login modal js 
+  async function checkUserExists() {
+      let mobileNumber = document.getElementById("loginMobile").value;
+      
+      if (!mobileNumber.match(/^[0-9]{10}$/)) {
+          alert("Please enter a valid 10-digit mobile number.");
+          return;
+      }
+
+      try {
+          let response = await fetch(`/api/checkUser?mobile=${mobileNumber}`);
+          let data = await response.json();
+
+          if (data.exists) {
+              sendOtp(mobileNumber);
+          } else {
+              document.getElementById("loginErrorDiv").classList.remove("d-none");
+              document.getElementById("loginErrorDiv").innerText = "User does not exist. Please sign up first!";
+          }
+      } catch (error) {
+          console.error("Error checking user:", error);
+          alert("Something went wrong. Please try again later.");
+      }
+  }
+
+  async function sendOtp(mobileNumber) {
+      try {
+          console.log(`Sending OTP to: ${mobileNumber}`);
+
+          let response = await fetch(`/api/sendOtp?mobile=${mobileNumber}`);
+          
+          if (!response.ok) {
+              throw new Error(`HTTP Error! Status: ${response.status}`);
+          }
+
+          let data = await response.json();
+          console.log("API Response:", data);
+
+          if (data.success) {
+              document.getElementById("loginOtpSection").classList.remove("d-none");
+          } else {
+              alert("Failed to send OTP. Please try again.");
+          }
+      } catch (error) {
+          console.error("Error sending OTP:", error);
+          alert(`Something went wrong: ${error.message}`);
+      }
+  }
+
+
+script. 
+
+  // function to change modal
+
+  function switchModal(currentModalId, targetModalId) {
+      const currentModalEl = document.getElementById(currentModalId);
+      const targetModalEl = document.getElementById(targetModalId);
+
+      // ✅ Ensure current modal exists before trying to hide it
+      if (currentModalEl) {
+          const currentModalInstance = bootstrap.Modal.getInstance(currentModalEl);
+          if (currentModalInstance) {
+              currentModalInstance.hide();
+          }
+      } else {
+          console.warn(`Modal with ID '${currentModalId}' does not exist.`);
+      }
+
+      // ✅ Ensure target modal exists before showing
+      setTimeout(() => {
+          if (targetModalEl) {
+              const targetModalInstance = new bootstrap.Modal(targetModalEl);
+              targetModalInstance.show();
+          } else {
+              console.error(`Modal with ID '${targetModalId}' does not exist.`);
+          }
+      }, 300); // Delay ensures smooth transition
+  }
+
+  // ✅ Open Login Modal from Signup Modal
+  function openLoginModal() {
+      switchModal("SignupModal", "LoginModal");
+  }
+
+  // ✅ Open Signup Modal from Login Modal
+  function openSignupModal() {
+      switchModal("LoginModal", "SignupModal");
+  }
+
+  // automatically reload 
   document.addEventListener("DOMContentLoaded", function () {
       updateNavbar(); // ✅ Ensure navbar updates on page load
       console.log("✅ Navbar loaded successfully!");
@@ -269,3 +367,4 @@ script.
           saveUserProfile(firstName, lastName, email);
       }
   });
+

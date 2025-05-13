@@ -7,6 +7,8 @@ const cors = require('cors');
 const connectDB = require('./db/dbconnect'); // Ensure this file exists and connects to MongoDB
 const User = require('./models/schema'); // Ensure the schema is correctly implemented
 const twilio = require('twilio');
+const Order = require("./models/order"); // Adjust the path if needed
+
 
 // Twilio setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -96,47 +98,199 @@ app.post('/send-otp', async (req, res) => {
 
 // Save User Endpoint
 app.post('/save-user', async (req, res) => {
-  const { firstName, lastName, email, mobile, otp } = req.body;
+    const { firstName, lastName, email, mobile, otp } = req.body;
 
-  // Input validation
-  if (!firstName || !lastName || !email || !mobile || !otp) {
-    return res.status(400).json({ success: false, message: "All fields are required." });
-  }
-
-  if (req.session.otp !== otp || Date.now() > req.session.otpExpiry) {
-    return res.status(400).json({ success: false, message: "Invalid or expired OTP." });
-  }
-
-  try {
-    const newUser = new User({ firstName, lastName, email, mobile });
-    await newUser.save();
-    res.status(201).json({ success: true, message: "User saved successfully", user: newUser });
-  } catch (error) {
-    if (error.code === 11000) {
-      res.status(400).json({ success: false, message: "Duplicate entry detected." });
-    } else {
-      console.error("Error saving user:", error);
-      res.status(500).json({ success: false, message: "An internal error occurred." });
+    if (!firstName || !lastName || !email || !mobile || !otp) {
+        return res.status(400).json({ success: false, message: "All fields are required." });
     }
-  }
+
+    if (req.session.otp !== otp || Date.now() > req.session.otpExpiry) {
+        return res.status(400).json({ success: false, message: "Invalid or expired OTP." });
+    }
+
+    try {
+        const newUser = new User({ firstName, lastName, email, mobile });
+        await newUser.save();
+
+        // ✅ Store user ID in session after signup
+        req.session.userId = newUser._id;
+
+        // ✅ Send user ID to frontend
+        res.status(201).json({ 
+            success: true, 
+            message: "User saved successfully", 
+            userId: newUser._id // Sending only user ID
+        });
+
+    } catch (error) {
+        if (error.code === 11000) {
+            res.status(400).json({ success: false, message: "Duplicate entry detected." });
+        } else {
+            console.error("Error saving user:", error);
+            res.status(500).json({ success: false, message: "An internal error occurred." });
+        }
+    }
+});
+// get the user 
+app.get('/get-user', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ success: false, message: "User not logged in." });
+    }
+
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+
+        res.json({ success: true, userId: user._id });
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
 });
 
-// Check User Endpoint
-app.post("/check-user", async (req, res) => {
-  const { mobile } = req.body;
 
-  if (!mobile) {
-    return res.status(400).json({ success: false, message: "Mobile number is required." });
-  }
 
-  try {
-    const userExists = await User.exists({ mobile });
-    res.status(200).json({ success: true, exists: !!userExists });
-  } catch (error) {
-    console.error("Error in /check-user:", error);
-    res.status(500).json({ success: false, message: "An unexpected error occurred." });
-  }
+app.get('/getOrders', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(400).json({ message: "User not logged in!" });
+        }
+
+        const orders = await Order.find({ user: req.session.userId }).sort({ date: -1 });
+
+        if (!orders.length) {
+            return res.status(404).json({ message: "No orders found!" });
+        }
+
+        res.json(orders);
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ message: "Server error, please try again!" });
+    }
 });
+
+
+// Route to Save Order
+app.post('/saveOrder', async (req, res) => {
+    try {
+        const { paymentId, items, totalAmount, paymentMethod, user } = req.body;
+
+        if (!user || !paymentId) {
+            return res.status(400).json({ success: false, message: "Missing required fields." });
+        }
+
+        const newOrder = new Order({
+            paymentId,
+            user,
+            items: items.length > 0 ? items : [], // ✅ Ensure items array is not null
+            totalAmount,
+            paymentMethod,
+            status: "Pending",
+            date: new Date()
+        });
+
+        await newOrder.save(); // ✅ Save to database
+
+        console.log("Order saved successfully:", newOrder);
+        res.status(201).json({ success: true, message: "Order placed!", order: newOrder });
+    } catch (error) {
+        console.error("Error saving order:", error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
+});
+
+
+// ✅ Route to Fetch Orders for Logged-in User
+app.get('/getOrders/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User ID is required." });
+        }
+
+        const orders = await Order.find({ user: userId });
+
+        if (!orders || orders.length === 0) {
+            return res.json({ success: false, message: "No orders found!" });
+        }
+
+        res.json({ success: true, orders });
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
+});
+
+
+// ✅ Route to Cancel an Order
+app.post("/cancelOrder/:orderId", async (req, res) => {
+    try {
+        const order = await Order.findOne({ paymentId: req.params.orderId });
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found!" });
+        }
+
+        if (order.status !== "Paid") {
+            return res.status(400).json({ message: "Order cannot be canceled!" });
+        }
+
+        order.status = "Canceled";
+        await order.save();
+
+        res.json({ message: "Order canceled successfully!", order });
+    } catch (error) {
+        console.error("Error canceling order:", error);
+        res.status(500).json({ message: "Server error, please try again!" });
+    }
+});
+
+
+app.get("/api/checkUser", async (req, res) => {
+    try {
+        const { mobile } = req.query;
+        const user = await User.findOne({ mobile });
+
+        if (user) {
+            res.json({ exists: true });
+        } else {
+            res.json({ exists: false });
+        }
+    } catch (error) {
+        console.error("Error checking user:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+
+app.get("/api/sendOtp", async (req, res) => {
+    try {
+        const { mobile } = req.query;
+        if (!mobile) {
+            console.error("Error: Mobile number missing!");
+            return res.status(400).json({ error: "Mobile number is required!" });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        console.log(`Attempting to send OTP: ${otp} to ${mobile}`);
+
+        const message = await client.messages.create({
+            body: `Your OTP is ${otp}. Valid for 5 minutes.`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: mobile
+        });
+
+        console.log("Twilio response:", message.sid);
+        res.json({ success: true, otp, messageId: message.sid });
+    } catch (error) {
+        console.error("Twilio Error:", error);
+        res.status(500).json({ error: "Failed to send OTP via SMS" });
+    }
+});
+
+
 
 // Start the Server
 const PORT = process.env.PORT || 3000;
