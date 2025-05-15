@@ -12,6 +12,7 @@ const Order = require("./models/order"); // Adjust the path if needed
 
 // Twilio setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 const app = express();
 
@@ -94,6 +95,31 @@ app.post('/send-otp', async (req, res) => {
   }
 });
 
+// Resend OTP Endpoint
+app.post("/resend-otp", async (req, res) => {
+    const { phoneNumber } = req.body;
+
+    if (!phoneNumber) {
+        return res.status(400).json({ success: false, message: "Phone number is required!" });
+    }
+
+    try {
+        const newOtp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
+        console.log(`Generated OTP: ${newOtp} to: ${phoneNumber}`);
+
+        // Send OTP via Twilio SMS
+        await twilioClient.messages.create({
+            body: `Your OTP is: ${newOtp}`,
+            from: process.env.TWILIO_PHONE_NUMBER, // Replace with your Twilio phone number
+            to: phoneNumber,
+        });
+
+        res.json({ success: true, message: "New OTP sent successfully!" });
+    } catch (error) {
+        console.error("Error sending OTP:", error);
+        res.status(500).json({ success: false, message: "Failed to send OTP." });
+    }
+});
 
 
 // Save User Endpoint
@@ -104,7 +130,8 @@ app.post('/save-user', async (req, res) => {
         return res.status(400).json({ success: false, message: "All fields are required." });
     }
 
-    if (req.session.otp !== otp || Date.now() > req.session.otpExpiry) {
+    // ✅ Check if the provided OTP matches the latest one stored in the session
+    if (!req.session.otp || req.session.otp !== otp || Date.now() > req.session.otpExpiry) {
         return res.status(400).json({ success: false, message: "Invalid or expired OTP." });
     }
 
@@ -112,25 +139,16 @@ app.post('/save-user', async (req, res) => {
         const newUser = new User({ firstName, lastName, email, mobile });
         await newUser.save();
 
-        // ✅ Store user ID in session after signup
-        req.session.userId = newUser._id;
+        req.session.userId = newUser._id; // Store user ID in session
 
-        // ✅ Send user ID to frontend
-        res.status(201).json({ 
-            success: true, 
-            message: "User saved successfully", 
-            userId: newUser._id // Sending only user ID
-        });
-
+        res.status(201).json({ success: true, message: "User saved successfully", userId: newUser._id });
     } catch (error) {
-        if (error.code === 11000) {
-            res.status(400).json({ success: false, message: "Duplicate entry detected." });
-        } else {
-            console.error("Error saving user:", error);
-            res.status(500).json({ success: false, message: "An internal error occurred." });
-        }
+        console.error("Error saving user:", error);
+        res.status(500).json({ success: false, message: "An internal error occurred." });
     }
 });
+
+
 // get the user 
 app.get('/get-user', async (req, res) => {
     if (!req.session.userId) {

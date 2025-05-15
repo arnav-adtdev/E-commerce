@@ -295,12 +295,24 @@ script.
         let storedUser = localStorage.getItem("loggedInUser");
         let userData = storedUser ? JSON.parse(storedUser) : null;
 
+        // Reference profile section container
+        const profileSection = document.getElementById("profileSection");
+
         if (userData && userData.name) {
             document.getElementById("userNameProfile").textContent = userData.name;
             document.getElementById("userNameNavbar").textContent = userData.name;
             document.getElementById("userEmailProfile").textContent = userData.email || "Not Provided";
+
+            // Ensure the profile section is visible
+            if (profileSection) profileSection.style.display = "block";
+        } else {
+            console.error("Error loading user data. Hiding profile section.");
+            
+            // Hide profile section if user data is invalid
+            if (profileSection) profileSection.style.display = "none";
         }
     }
+
 
     // ✅ Function to Handle Logout
     function handleLogout() {
