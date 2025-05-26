@@ -1,37 +1,41 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const userId = localStorage.getItem("userId"); // Retrieve logged-in user ID
+    const ordersList = document.getElementById("ordersList");
 
-    if (!userId) {
-        alert("Please log in to view your orders.");
-        return;
+    // ✅ Fetch orders from API or local storage
+    function fetchOrders() {
+        fetch("/api/orders") // Replace with your actual API endpoint
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch orders");
+                }
+                return response.json();
+            })
+            .then(orders => {
+                displayOrders(orders);
+            })
+            .catch(error => {
+                console.error("Error fetching orders:", error);
+                ordersList.innerHTML = `<p class="text-danger text-center">⚠️ Failed to load orders.</p>`;
+            });
     }
 
-    fetch(`/getOrders/${userId}`)
-        .then(response => response.json())
-        .then(data => {
-            const ordersList = document.getElementById("ordersList");
-            const orderSuccessMessage = document.getElementById("orderSuccessMessage");
-            ordersList.innerHTML = "";
+    // ✅ Display orders in the UI
+    function displayOrders(orders) {
+        if (!orders.length) {
+            ordersList.innerHTML = `<p class="text-muted text-center">No orders found.</p>`;
+            return;
+        }
 
-            if (data.length > 0) {
-                orderSuccessMessage.style.display = "block"; // Show success message
-            } else {
-                orderSuccessMessage.innerText = "No orders found!";
-                orderSuccessMessage.style.display = "block";
-            }
+        ordersList.innerHTML = orders.map(order => `
+            <div class="card mb-3 p-3 shadow-sm">
+                <h5 class="fw-bold text-primary">Order #${order.id}</h5>
+                <p><strong>Product:</strong> ${order.productName}</p>
+                <p><strong>Quantity:</strong> ${order.quantity}</p>
+                <p><strong>Price:</strong> ₹${order.price}</p>
+                <p><strong>Status:</strong> <span class="badge bg-success">${order.status}</span></p>
+            </div>
+        `).join("");
+    }
 
-            data.forEach(order => {
-                ordersList.innerHTML += `
-                    <div class="card p-3 mb-3">
-                        <h4 class="text-primary">Order ID: ${order.paymentId}</h4>
-                        <p><strong>Status:</strong> ${order.status}</p>
-                        <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-                        <p><strong>Total Amount:</strong> ₹${order.amount}</p>
-                        <p><strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}</p>
-                        <p><strong>Estimated Delivery:</strong> ${new Date(order.deliveryDate).toLocaleDateString()}</p>
-                        <p><strong>Tracking Status:</strong> ${order.trackingStatus}</p>
-                    </div>`;
-            });
-        })
-        .catch(error => console.error("Error fetching orders:", error));
+    fetchOrders(); // ✅ Call function to load orders
 });

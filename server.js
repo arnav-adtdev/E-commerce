@@ -8,7 +8,7 @@ const connectDB = require('./db/dbconnect'); // Ensure this file exists and conn
 const User = require('./models/schema'); // Ensure the schema is correctly implemented
 const twilio = require('twilio');
 const Order = require("./models/order"); // Adjust the path if needed
-
+const router = express.Router();
 
 // Twilio setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -221,9 +221,10 @@ app.post('/saveOrder', async (req, res) => {
 
 
 // ✅ Route to Fetch Orders for Logged-in User
-app.get('/getOrders/:userId', async (req, res) => {
+router.get('/getOrders/:userId', async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const userId = req.params.userId?.trim(); // ✅ Trim userId to avoid spaces
+
         if (!userId) {
             return res.status(400).json({ success: false, message: "User ID is required." });
         }
@@ -231,17 +232,18 @@ app.get('/getOrders/:userId', async (req, res) => {
         const orders = await Order.find({ user: userId });
 
         if (!orders || orders.length === 0) {
-            return res.json({ success: false, message: "No orders found!" });
+            return res.status(404).json({ success: false, message: "No orders found!" });
         }
 
         res.json({ success: true, orders });
     } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error("❌ Error fetching orders:", error);
         res.status(500).json({ success: false, message: "Internal server error." });
     }
 });
 
 
+module.exports = router; // ✅ Export router for use in main app
 // ✅ Route to Cancel an Order
 app.post("/cancelOrder/:orderId", async (req, res) => {
     try {

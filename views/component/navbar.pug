@@ -278,48 +278,53 @@ script.
         console.log("✅ Navbar loaded successfully!");
     });
 
+
     // ✅ Function to Save User Profile, Close Modal & Update Navbar
     function saveUserProfile(firstName, lastName, email = "") {
         let user = { name: `${firstName} ${lastName}`, email };
         localStorage.setItem("loggedInUser", JSON.stringify(user));
-        updateNavbar(); // Refresh Navbar UI
 
-        // 🔹 Close Signup Modal
-        let signupModalElement = document.getElementById("SignupModal");
-        let signupModal = bootstrap.Modal.getInstance(signupModalElement);
-        if (signupModal) signupModal.hide();
+        console.log("✅ User data saved successfully:", user); // Debugging step
+
+        updateNavbar(); // ✅ Refresh UI
     }
+
 
     // ✅ Function to Update Profile Modal Data
     function updateProfileModal() {
-        let storedUser = localStorage.getItem("loggedInUser");
-        let userData = storedUser ? JSON.parse(storedUser) : null;
+            let storedUser = localStorage.getItem("loggedInUser");
+            let userData = storedUser ? JSON.parse(storedUser) : null;
 
-        // Reference profile section container
-        const profileSection = document.getElementById("profileSection");
+            // Reference profile section container
+            const profileSection = document.getElementById("profileSection");
 
-        if (userData && userData.name) {
-            document.getElementById("userNameProfile").textContent = userData.name;
-            document.getElementById("userNameNavbar").textContent = userData.name;
-            document.getElementById("userEmailProfile").textContent = userData.email || "Not Provided";
+            if (userData && userData.name) {
+                document.getElementById("userNameProfile").textContent = userData.name;
+                document.getElementById("userNameNavbar").textContent = userData.name;
+                document.getElementById("userEmailProfile").textContent = userData.email || "Not Provided";
 
-            // Ensure the profile section is visible
-            if (profileSection) profileSection.style.display = "block";
-        } else {
-            console.error("Error loading user data. Hiding profile section.");
-            
-            // Hide profile section if user data is invalid
-            if (profileSection) profileSection.style.display = "none";
+                // Ensure the profile section is visible
+                if (profileSection) profileSection.style.display = "block";
+            } else {
+                console.error("Error loading user data. Hiding profile section.");
+                
+                // Hide profile section if user data is invalid
+                if (profileSection) profileSection.style.display = "none";
+            }
         }
-    }
 
 
     // ✅ Function to Handle Logout
     function handleLogout() {
-        localStorage.removeItem("loggedInUser"); // Clear user data
-        updateNavbar(); // Refresh Navbar UI
+        localStorage.removeItem("loggedInUser"); // ✅ Clear user data manually
+        updateNavbar(); // ✅ Refresh Navbar UI
         alert("✅ Successfully logged out!");
     }
+
+    // ✅ Attach logout function to button click
+    document.getElementById("logoutBtn")?.addEventListener("click", function () {
+        handleLogout();
+    });
 
     // ✅ Function to Update Navbar Elements Based on Login State
     function updateNavbar() {
@@ -335,15 +340,18 @@ script.
         let storedUser = localStorage.getItem("loggedInUser");
         let userData = storedUser ? JSON.parse(storedUser) : null;
 
-        if (userData && userData.name) {
-            accountSection.classList.add("d-none"); // Hide "Account"
-            profileSection.classList.remove("d-none"); // Show "Profile"
-            userNameNavbar.textContent = userData.name; // Update username
-            updateProfileModal(); // ✅ Update Profile Modal Data
-        } else {
+        // ✅ Only log out if user data is truly missing
+        if (!userData || !userData.name) {
+            console.warn("⛔ User is logged out. Hiding profile section.");
             accountSection.classList.remove("d-none"); // Show "Account"
             profileSection.classList.add("d-none"); // Hide "Profile"
+            return;
         }
+
+        // ✅ Show profile if user is logged in
+        accountSection.classList.add("d-none"); // Hide "Account"
+        profileSection.classList.remove("d-none"); // Show "Profile"
+        userNameNavbar.textContent = userData.name;
     }
 
     // ✅ Function to Handle Navbar Toggle Functionality for Large Screens
@@ -378,4 +386,3 @@ script.
             saveUserProfile(firstName, lastName, email);
         }
     });
-
