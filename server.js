@@ -310,7 +310,8 @@ app.get("/api/sendOtp", async (req, res) => {
     }
 });
 
-
+// **Mount the Router**
+app.use('/api', router);
 
 // Start the Server
 const PORT = process.env.PORT || 3000;
