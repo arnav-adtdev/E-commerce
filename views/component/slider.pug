@@ -41,15 +41,32 @@ html(lang="en")
 
             /* Responsive Fixes */
             @media (max-width: 768px) {
+                /* Adjust delivery charge banner */
                 .container .row.align-items-center {
                     flex-direction: column;
+                    max-width: 100%;
                 }
+
+                /* Improve carousel image sizing */
                 .carousel-inner img {
-                    height: 150px; 
+                    height: auto;
+                    max-height: 250px;
                     object-fit: cover;
                 }
-                
+
+                /* Make navigation buttons more touch-friendly */
+                .carousel-control-prev-icon, 
+                .carousel-control-next-icon {
+                    padding: 15px;
+                    background-color: rgba(0, 0, 0, 0.6);
+                }
+
+                /* Adjust carousel indicators position */
+                .carousel-indicators {
+                    bottom: -10px; /* Move indicators slightly to avoid overlapping */
+                }
             }
+
             @media (min-width: 768px) {
                 .hidden-lg {
                     display: none;

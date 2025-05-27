@@ -60,7 +60,7 @@ app.get('/payment', (req, res) => {
 });
 
 app.get("/men", (req, res) => {
-  res.render("pages/men");
+  res.render("pages/header/men");
 });
 
 //component page render
