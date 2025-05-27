@@ -8,11 +8,11 @@ const connectDB = require('./db/dbconnect'); // Ensure this file exists and conn
 const User = require('./models/schema'); // Ensure the schema is correctly implemented
 const twilio = require('twilio');
 const Order = require("./models/order"); // Adjust the path if needed
-const router = express.Router();
+const router = express.Router(); // ✅ Initialize router first
 
 // Twilio setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+// const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 const app = express();
 
@@ -142,7 +142,7 @@ app.post("/resend-otp", async (req, res) => {
         console.log(`Generated OTP: ${newOtp} to: ${phoneNumber}`);
 
         // Send OTP via Twilio SMS
-        await twilioClient.messages.create({
+        await client.messages.create({
             body: `Your OTP is: ${newOtp}`,
             from: process.env.TWILIO_PHONE_NUMBER, // Replace with your Twilio phone number
             to: phoneNumber,
