@@ -8,7 +8,9 @@ const connectDB = require('./db/dbconnect'); // Ensure this file exists and conn
 const User = require('./models/schema'); // Ensure the schema is correctly implemented
 const twilio = require('twilio');
 const Order = require("./models/order"); // Adjust the path if needed
-const router = express.Router(); // ✅ Initialize router first
+
+const router = express.Router();
+
 
 // Twilio setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -22,8 +24,9 @@ connectDB();
 // Middleware setup
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cors({
@@ -256,25 +259,13 @@ app.post('/saveOrder', async (req, res) => {
 
 // ✅ Route to Fetch Orders for Logged-in User
 router.get('/getOrders/:userId', async (req, res) => {
-    try {
-        const userId = req.params.userId?.trim(); // ✅ Trim userId to avoid spaces
-
-        if (!userId) {
-            return res.status(400).json({ success: false, message: "User ID is required." });
-        }
-
-        const orders = await Order.find({ user: userId });
-
-        if (!orders || orders.length === 0) {
-            return res.status(404).json({ success: false, message: "No orders found!" });
-        }
-
-        res.json({ success: true, orders });
-    } catch (error) {
-        console.error("❌ Error fetching orders:", error);
-        res.status(500).json({ success: false, message: "Internal server error." });
+    if (!req.params.userId) {
+        return res.status(400).json({ message: "User ID is required." });
     }
+    const orders = await Order.find({ user: req.params.userId });
+    res.json({ success: true, orders });
 });
+
 
 
 module.exports = router; // ✅ Export router for use in main app
