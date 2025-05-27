@@ -30,6 +30,9 @@ html(lang="en")
             .carousel-inner img {
                 border-radius: 10px;
                 object-fit: cover;
+                height: 367px; 
+                width: 100%;
+
             }
 
             /* Styled Navigation Buttons */
@@ -41,31 +44,34 @@ html(lang="en")
 
             /* Responsive Fixes */
             @media (max-width: 768px) {
-                /* Adjust delivery charge banner */
-                .container .row.align-items-center {
-                    flex-direction: column;
-                    max-width: 100%;
-                }
-
-                /* Improve carousel image sizing */
+                /* Ensure images scale properly */
                 .carousel-inner img {
-                    height: auto;
-                    max-height: 250px;
+                    width: 100%;
+                    height: 150px;
                     object-fit: cover;
                 }
 
-                /* Make navigation buttons more touch-friendly */
+                /* Improve navigation button sizes */
                 .carousel-control-prev-icon, 
                 .carousel-control-next-icon {
                     padding: 15px;
                     background-color: rgba(0, 0, 0, 0.6);
                 }
 
-                /* Adjust carousel indicators position */
+                /* Adjust carousel indicators */
                 .carousel-indicators {
-                    bottom: -10px; /* Move indicators slightly to avoid overlapping */
+                    bottom: -15px; /* Prevent overlapping */
+                    justify-content: center;
+                }
+
+                /* Enable horizontal scrolling */
+                .container-fluid.p-0 {
+                    overflow-x: auto;
+                    scroll-behavior: smooth;
+                    white-space: nowrap;
                 }
             }
+
 
             @media (min-width: 768px) {
                 .hidden-lg {
@@ -98,21 +104,21 @@ html(lang="en")
                     .carousel-item.active
                         img(src="/slider/slider1.png" class="d-block w-100" alt="Scenic landscape view")
                     .carousel-item
-                        img(src="/slider/slider2.png" class="d-block w-100" alt="Sunset over the ocean" style="height: 367px; object-fit: cover;")
+                        img(src="/slider/slider2.png" class="d-block w-100" alt="Sunset over the ocean")
                     .carousel-item
-                        img(src="/slider/slider3.png" class="d-block w-100" alt="Mountain peak with clouds" style="height: 367px; object-fit: cover;")
+                        img(src="/slider/slider3.png" class="d-block w-100" alt="Mountain peak with clouds")
                     .carousel-item
-                        img(src="/slider/slider4.png" class="d-block w-100" alt="City skyline at night" style="height: 367px; object-fit: cover;")
+                        img(src="/slider/slider4.png" class="d-block w-100" alt="City skyline at night")
                     .carousel-item
                         img(src="/slider/slider1.png" class="d-block w-100" alt="Forest path with tall trees")
                     .carousel-item
-                        img(src="/slider/slider2.png" class="d-block w-100" alt="Sunset over the ocean" style="height: 367px; object-fit: cover;")
+                        img(src="/slider/slider2.png" class="d-block w-100" alt="Sunset over the ocean")
                     .carousel-item
-                        img(src="/slider/slider3.png" class="d-block w-100" alt="Mountain peak with clouds" style="height: 367px; object-fit: cover;")
+                        img(src="/slider/slider3.png" class="d-block w-100" alt="Mountain peak with clouds")
                     .carousel-item
-                        img(src="/slider/slider4.png" class="d-block w-100" alt="City skyline at night" style="height: 367px; object-fit: cover;")
+                        img(src="/slider/slider4.png" class="d-block w-100" alt="City skyline at night")
                     .carousel-item
-                        img(src="/slider/slider3.png" class="d-block w-100" alt="Mountain peak with clouds" style="height: 367px; object-fit: cover;")
+                        img(src="/slider/slider3.png" class="d-block w-100" alt="Mountain peak with clouds")
 
                 .carousel-control-prev(href="#imageSlider" role="button" data-bs-slide="prev")
                     span.carousel-control-prev-icon(aria-hidden="true")

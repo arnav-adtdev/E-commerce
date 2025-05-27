@@ -31,7 +31,7 @@ body {
 
 /* Product Image */
 .card-img-top {
-    height: 240px;
+    height: 400px;
     object-fit: cover;
 }
 
@@ -82,5 +82,22 @@ body {
     .add-to-cart {
         font-size: 0.5rem; /* Smaller font */
         padding: 6px 10px; /* Smaller padding */
+    }
+}
+@media (max-width: 768px) {
+    .mensection.card {
+        min-height: 380px; /* Adjust as needed */
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 200px; /* Ensures body content alignment */
+    }
+
+    .card-img-top {
+        height: 200px; /* Controls image height */
+        object-fit: cover;
     }
 }

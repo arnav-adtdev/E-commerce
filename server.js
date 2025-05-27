@@ -59,9 +59,43 @@ app.get('/payment', (req, res) => {
   res.render("pages/payment");
 });
 
+// Render the pages/header section
 app.get("/men", (req, res) => {
   res.render("pages/header/men");
 });
+
+app.get("/women", (req, res) => {
+  res.render("pages/header/women");
+});
+
+app.get("/kids", (req, res) => {
+    res.render("pages/header/kids");
+});
+
+app.get("/kitchen", (req, res) => {
+    res.render("pages/header/kitchen");
+});
+
+app.get("/appliance", (req, res) => {
+    res.render("pages/header/appliance");
+});
+
+app.get("/food", (req, res) => {
+    res.render("pages/header/food");
+});
+
+app.get("/householdcare", (req, res) => {
+    res.render("pages/header/householdcare");
+});
+
+app.get("/travel", (req, res) => {
+    res.render("pages/header/travel");
+});
+
+app.get("/personalcare", (req, res) => {
+    res.render("pages/header/personalcare");
+});
+
 
 //component page render
 app.get("/footer", (req, res) => {

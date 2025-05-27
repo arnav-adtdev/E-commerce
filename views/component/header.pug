@@ -49,7 +49,7 @@ html(lang="en")
                         src="header/women.jpg" 
                         alt="Slider Image 1" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
-                        onclick="toggleDropdown('dropdown1')"
+                        onclick="redirectToWomenPage()"
                     )  
                     p Women
                     
@@ -60,7 +60,7 @@ html(lang="en")
                         src="header/kids.jpg" 
                         alt="Slider Image 2" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
-                        onclick="toggleDropdown('dropdown2')"
+                        onclick="redirectToKidsPage()"
                     ) 
                     p Kids & Infants
                     
@@ -81,7 +81,7 @@ html(lang="en")
                         src="header/kitchen.jpg" 
                         alt="Slider Image 4" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
-                        onclick="toggleDropdown('dropdown4')"
+                        onclick="redirectToKitchenPage()"
                     ) 
                     p Home & Kitchen
                     
@@ -91,7 +91,7 @@ html(lang="en")
                         src="header/appliances.jpg" 
                         alt="Slider Image 5" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
-                        onclick="toggleDropdown('dropdown5')"
+                        onclick="redirectToAppliancesPage()"
                     ) 
                     p Appliances
                     
@@ -100,7 +100,7 @@ html(lang="en")
                         src="header/travel.jpg" 
                         alt="Slider Image 6" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000"
-                        onclick="toggleDropdown('dropdown6')"
+                        onclick="redirectToTravelPage()"
                     ) 
                     p Travel
                     
@@ -110,7 +110,7 @@ html(lang="en")
                         src="header/food.jpg" 
                         alt="Slider Image 7" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
-                        onclick="toggleDropdown('dropdown7')"
+                        onclick="redirectToFoodPage()"
                     ) 
                     p Food
                     
@@ -120,7 +120,7 @@ html(lang="en")
                         src="header/personalcare.jpg" 
                         alt="Slider Image 8" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
-                        onclick="toggleDropdown('dropdown8')"
+                        onclick="redirectToPersonalCarePage()"
                     ) 
                     p Personal Care
                     
@@ -130,12 +130,45 @@ html(lang="en")
                         src="header/household.jpg" 
                         alt="Slider Image 9" 
                         style="border-radius:60%; height:75px; width:75px; display:block; border:2px solid #000" 
-                        onclick="toggleDropdown('dropdown9')"
+                        onclick="redirectToHouseHoldCarePage()"
                     ) 
                     p Household Care
                     
 script. 
     function redirectToMenPage() {
-        
         window.location.href = '/men';
     }
+
+    function redirectToWomenPage() {
+        window.location.href = '/women';
+    }
+
+    function redirectToKidsPage() {
+        window.location.href = '/kids';
+    }
+
+    function redirectToKitchenPage() {
+        window.location.href = '/kitchen';
+    }
+
+    function redirectToAppliancesPage() {
+        window.location.href = '/appliance';
+    }
+
+    function redirectToTravelPage() {
+        window.location.href = '/travel';
+    }
+
+    function redirectToFoodPage() {
+        window.location.href = '/food';
+    }
+
+    function redirectToPersonalCarePage() {
+        window.location.href = '/personalcare';
+    }
+
+    function redirectToHouseHoldCarePage() {
+        window.location.href = '/householdcare';
+    }
+
+    
